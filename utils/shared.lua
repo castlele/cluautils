@@ -19,6 +19,8 @@ function CUtils.is_object(object)
     return false
 end
 
+---@param str string
+---@return boolean
 function CUtils.is_string_nil_or_empty(str)
     return str == nil or str:is_empty()
 end
