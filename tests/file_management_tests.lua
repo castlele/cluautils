@@ -45,9 +45,18 @@ function FileManagementTestCase:test_is_file_exists_true()
 end
 
 function FileManagementTestCase:test_is_file_exists_false()
-    local none_existing_file = "~/somerandomfile.txt"
+    local none_existing_file = "./somerandomfile.txt"
 
     return FM.is_file_exists(none_existing_file) == false
+end
+
+function FileManagementTestCase:test_create_file()
+    local none_existing_file = "./somerandomfile.txt"
+
+    local is_file_created = FM.create_file(none_existing_file)
+    FM.delete_file(none_existing_file)
+
+    return is_file_created
 end
 
 FileManagementTestCase:run_tests()

@@ -1,5 +1,5 @@
 require("tests.cbase_test_case")
-require("utils.shared")
+require("utils.cutils")
 
 CUtilsTestCase = CTestCase
 

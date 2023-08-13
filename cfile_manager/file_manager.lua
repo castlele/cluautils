@@ -1,4 +1,4 @@
-require("utils.shared")
+require("utils.cutils")
 
 FM = FM or {}
 
@@ -132,6 +132,24 @@ function FM.get_dir_content(param_table)
     local full_cmd = find_cmd .. sep .. file_param .. sep .. name_param .. sep  .. max_depth_param
 
     return FM.get_lines_from_file(io.popen(full_cmd, IOMODE.READ), "*l")
+end
+
+---@param file_path string
+---@return boolean false if error occured or file already exists else true
+function FM.create_file(file_path)
+    if FM.is_file_exists(file_path) then
+        return false
+    end
+
+    local file = io.open(file_path, IOMODE.WRITE)
+
+    if type(file) == "string" or file == nil then
+        return false
+    end
+
+    file:close()
+
+    return true
 end
 
 return FM
