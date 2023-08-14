@@ -1,5 +1,5 @@
-require("tests/cbase_test_case")
-require("cfile_manager.file_manager")
+require("src.tests.base_test_case")
+require("src.file_manager.file_manager")
 
 FileManagementTestCase = CTestCase
 

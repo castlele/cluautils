@@ -1,5 +1,5 @@
-require("tests.cbase_test_case")
-require("utils.table_utils")
+require("src.tests.base_test_case")
+require("src.table_utils.table_utils")
 
 TableUtilsTestCase = CTestCase
 

@@ -1,5 +1,5 @@
-require("tests.cbase_test_case")
-require("utils.cutils")
+require("src.tests.base_test_case")
+require("src.cluautils")
 
 CUtilsTestCase = CTestCase
 

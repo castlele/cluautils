@@ -1,5 +1,5 @@
-require("tests.cbase_test_case")
-require("utils.string_utils")
+require("src.tests.base_test_case")
+require("src.string_utils.string_utils")
 
 StringTestCase = CTestCase
 
