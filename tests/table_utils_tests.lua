@@ -5,7 +5,7 @@ TableUtilsTestCase = CTestCase
 
 ---@MARK - contains method tests
 
-function TableUtilsTestCase:table_contains_empty()
+function TableUtilsTestCase:test_table_contains_empty()
     local t = {}
     local value = "hello"
 
@@ -14,7 +14,7 @@ function TableUtilsTestCase:table_contains_empty()
     return result == false
 end
 
-function TableUtilsTestCase:table_contains_string()
+function TableUtilsTestCase:test_table_contains_string()
     local t = {"hello", "world"}
     local value = "hello"
 
@@ -23,7 +23,7 @@ function TableUtilsTestCase:table_contains_string()
     return result
 end
 
-function TableUtilsTestCase:table_contains_integer()
+function TableUtilsTestCase:test_table_contains_integer()
     local t = {1, 2, 3, 4, 5}
     local value = 5
 
@@ -32,7 +32,7 @@ function TableUtilsTestCase:table_contains_integer()
     return result
 end
 
-function TableUtilsTestCase:table_does_not_contain_string()
+function TableUtilsTestCase:test_table_does_not_contain_string()
     local t = {"hello", "world"}
     local value = "castlelecs"
 
@@ -41,7 +41,7 @@ function TableUtilsTestCase:table_does_not_contain_string()
     return result == false
 end
 
-function TableUtilsTestCase:table_does_not_contain_integer()
+function TableUtilsTestCase:test_table_does_not_contain_integer()
     local t = {1, 2, 3, 4, 5}
     local value = 0
 
@@ -52,7 +52,7 @@ end
 
 ---@MARK - is_empty method tests
 
-function TableUtilsTestCase:table_is_empty_true()
+function TableUtilsTestCase:test_table_is_empty_true()
     local t = {}
 
     local result = table.is_empty(t)
@@ -60,7 +60,7 @@ function TableUtilsTestCase:table_is_empty_true()
     return result
 end
 
-function TableUtilsTestCase:table_is_empty_false()
+function TableUtilsTestCase:test_table_is_empty_false()
     local t = {1, 2, 3}
 
     local result = table.is_empty(t)
@@ -70,7 +70,7 @@ end
 
 ---@MARK - get_index method tests
 
-function TableUtilsTestCase:table_index_of_non_existing_value()
+function TableUtilsTestCase:test_table_index_of_non_existing_value()
     local t = {1, 2, 3, 4, 5}
 
     local result = table.get_index(t, 6)
@@ -78,12 +78,91 @@ function TableUtilsTestCase:table_index_of_non_existing_value()
     return result == nil
 end
 
-function TableUtilsTestCase:table_index_of_existing_value()
+function TableUtilsTestCase:test_table_index_of_existing_value()
     local t = {1, 2, 3, 4, 5}
 
     local result = table.get_index(t, 5)
 
     return result == #t
+end
+
+---@MARK - is_equal method tests
+
+function TableUtilsTestCase:test_equatability_of_empty_tables()
+    local t1 = {}
+    local t2 = {}
+
+    local result = table.is_equal(t1, t2)
+
+    return result == true
+end
+
+function TableUtilsTestCase:test_equatability_of_different_tables()
+    local t1 = {1, 2, 3}
+    local t2 = {3, 2, 1}
+
+    local result = table.is_equal(t1, t2)
+
+    return result == false
+end
+
+function TableUtilsTestCase:test_equatability_of_equal_tables()
+    local t1 = {1, 2, 3}
+    local t2 = {1, 2, 3}
+
+    local result = table.is_equal(t1, t2)
+
+    return result == true
+end
+
+---@MARK - concat_tables method tests
+
+function TableUtilsTestCase:test_concat_tables_empty_tables()
+    local t1 = {}
+    local t2 = {}
+
+    local result = table.concat_tables(t1, t2)
+
+    return table.is_equal(result, {})
+end
+
+function TableUtilsTestCase:test_concat_tables_empty_and_none_empty()
+    local t1 = {}
+    local t2 = {1, 2, 3}
+
+    local result = table.concat_tables(t1, t2)
+
+    return table.is_equal(result, {1, 2, 3})
+end
+
+function TableUtilsTestCase:test_concat_tables_none_empty_and_empty()
+    local t1 = {1, 2, 3}
+    local t2 = {}
+
+    local result = table.concat_tables(t1, t2)
+
+    return table.is_equal(result, {1, 2, 3})
+end
+
+function TableUtilsTestCase:test_concat_tables_none_empty_tables()
+    local t1 = {1, 2, 3}
+    local t2 = {4, 5, 6}
+
+    local result = table.concat_tables(t1, t2)
+
+    return table.is_equal(result, {1, 2, 3, 4, 5, 6})
+end
+
+function TableUtilsTestCase:test_concat_tables_with_condition()
+    local t1 = {1, 2, 3}
+    local t2 = {4, 5, 6}
+    local even_num_filter = function (num)
+        return num % 2 == 0
+    end
+
+    local result = table.concat_tables(t1, t2, even_num_filter)
+
+    return table.is_equal(result, {2, 4, 6})
 end
 
 TableUtilsTestCase:run_tests()

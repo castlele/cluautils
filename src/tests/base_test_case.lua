@@ -16,7 +16,7 @@ end
 ---@return boolean
 function CTestCase:_is_private(test_name)
     local is_private = test_name:find("_", 1, true) == 1
-    local is_init = test_name:find("new", 1, true) ~= nil
+    local is_init = test_name == "new"
     local is_assert = test_name:find("assert*", 1, false) ~= nil
     local is_run_tests = test_name:find("run_tests", 1, true) ~= nil
     local is_test_case = test_name:find("test*", 1, false) ~= nil

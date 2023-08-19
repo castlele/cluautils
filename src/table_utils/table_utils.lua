@@ -34,3 +34,43 @@ function table:get_index(value)
 
     return nil
 end
+
+---@param other_table table
+---@return boolean
+function table:is_equal(other_table)
+    if #self ~= #other_table then
+        return false
+    end
+
+    for key, value in pairs(self) do
+        if other_table[key] ~= value then
+            return false
+        end
+    end
+
+    return true
+end
+
+---@param other_table table
+---@param element_condition? fun(any):boolean
+---@return table
+function table:concat_tables(other_table, element_condition)
+    local always_true_fun = function () return true end
+    element_condition = element_condition or always_true_fun
+
+    local final_result = {}
+
+    for _, value in pairs(self) do
+        if element_condition(value) then
+            table.insert(final_result, value)
+        end
+    end
+
+    for _, value in pairs(other_table) do
+        if element_condition(value) then
+            table.insert(final_result, value)
+        end
+    end
+
+    return final_result
+end

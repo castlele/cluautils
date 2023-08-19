@@ -1,8 +1,8 @@
 package = "cluautils"
-version = "1.2-1"
+version = "1.3-4"
 source = {
    url = "git+ssh://git@github.com/castlele/cluautils.git",
-    tag = "1.2.0"
+    tag = "1.3.0"
 }
 description = {
    homepage = "*** please enter a project homepage ***",
@@ -15,9 +15,10 @@ dependencies = {
 build = {
    type = "builtin",
    modules = {
+      ["cluautils"] = "src/cluautils.lua",
+      -- ["cluautils.json"] = "src/json/json.lua",
       ["cluautils.tests.base_test_case"] = "src/tests/base_test_case.lua",
       ["cluautils.file_manager"] = "src/file_manager/file_manager.lua",
-      ["cluautils"] = "src/cluautils.lua",
       ["cluautils.string_utils"] = "src/string_utils/string_utils.lua",
       ["cluautils.table_utils"] = "src/table_utils/table_utils.lua",
    },

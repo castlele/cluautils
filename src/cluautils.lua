@@ -1,4 +1,4 @@
-require("src.string_utils.string_utils")
+require("cluautils.string_utils")
 
 CUtils = CUtils or {}
 

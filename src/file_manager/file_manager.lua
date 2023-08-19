@@ -1,4 +1,4 @@
-require("src.cluautils")
+require("cluautils")
 
 FM = FM or {}
 
