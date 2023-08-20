@@ -1,4 +1,4 @@
-require("src.table_utils.table_utils")
+require("cluautils.table_utils")
 
 ---@MARK - Constants
 
