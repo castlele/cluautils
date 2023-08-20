@@ -59,4 +59,33 @@ function FileManagementTestCase:test_create_file()
     return is_file_created
 end
 
+function FileManagementTestCase:test_get_file_content_from_none_existing_file()
+    local none_existing_file = "./somerandomfile.txt"
+
+    local content = FM.get_file_content(none_existing_file)
+
+    return content == nil
+end
+
+function FileManagementTestCase:test_get_file_content_from_empty_file()
+    local empty_file = "./somerandomfile.txt"
+    FM.write_to_file(empty_file, IOMODE.WRITE, function () return "" end)
+
+    local content = FM.get_file_content(empty_file)
+
+    FM.delete_file(empty_file)
+    return content == ""
+end
+
+function FileManagementTestCase:test_get_file_content_from_none_empty_file()
+    local expected_content = "Hello, world"
+    local empty_file = "./somerandomfile.txt"
+    FM.write_to_file(empty_file, IOMODE.WRITE, function () return expected_content end)
+
+    local content = FM.get_file_content(empty_file)
+
+    FM.delete_file(empty_file)
+    return content == expected_content
+end
+
 FileManagementTestCase:run_tests()

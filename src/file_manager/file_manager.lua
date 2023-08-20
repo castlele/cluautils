@@ -19,6 +19,24 @@ function FM.get_lines_from_file(file, mode)
     return result
 end
 
+---@param file_path string
+---@return string?
+function FM.get_file_content(file_path)
+    if not FM.is_file_exists(file_path) then
+        return nil
+    end
+
+    local file = io.open(file_path, IOMODE.READ)
+
+    if file == nil then
+        return nil
+    end
+
+    local content = table.concat(FM.get_lines_from_file(file), "\n")
+
+    return content
+end
+
 ---@MARK - File system manipulations
 
 FileType = {
