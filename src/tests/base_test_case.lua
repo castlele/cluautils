@@ -1,6 +1,27 @@
 local error_color = "\27[31m"
 local success_color = '\27[32m'
-local clear_color = "\27[0m"
+
+local function log_message(msg)
+    print(msg)
+end
+
+local function log_success(msg)
+    if vim ~= nil then
+        vim.notify(msg, vim.log.levels.INFO, {})
+        return
+    end
+
+    log_message(success_color .. msg .. success_color)
+end
+
+local function log_error(msg)
+    if vim ~= nil then
+        vim.notify(msg, vim.log.levels.WARN)
+        return
+    end
+
+    log_message(error_color .. msg .. error_color)
+end
 
 CTestCase = {}
 
@@ -39,24 +60,18 @@ function CTestCase:run_tests()
 
     for test_name, test_case in pairs(table) do
         if not self:_is_private(test_name) then
-            print("Running test case: {" .. test_name .. "}")
+            log_message("Running test case: {" .. test_name .. "}")
             self:set_up()
 
             local result = test_case()
-            local message = ""
-            local color = ""
-
 
             if result == nil or result then
-                message = "%sTest case: {" .. test_name .. "} has passed successfully%s"
-                color = success_color
+                log_success("Test case: {" .. test_name .. "} has passed successfully")
             else
-                message = "%sTest case: {" .. test_name .. "} has failed%s"
-                color = error_color
+                log_error("Test case: {" .. test_name .. "} has failed")
             end
 
             self:tear_down()
-            print(message:format(color, clear_color))
         end
     end
 end
