@@ -74,3 +74,31 @@ function table:concat_tables(other_table, element_condition)
 
     return final_result
 end
+
+---@generic T
+---@param callback fun(element: T):boolean
+---@return table
+function table:filter(callback)
+    local result = {}
+
+    for _, value in pairs(self) do
+        if callback(value) then
+            table.insert(result, value)
+        end
+    end
+
+    return result
+end
+
+---@generic T
+---@param callback fun(talbe_element: T):T
+---@return table
+function table:map(callback)
+    local result = {}
+
+    for _, value in pairs(self) do
+        table.insert(result, callback(value))
+    end
+
+    return result
+end

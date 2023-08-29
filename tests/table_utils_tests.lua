@@ -165,4 +165,56 @@ function TableUtilsTestCase:test_concat_tables_with_condition()
     return table.is_equal(result, {2, 4, 6})
 end
 
+---@MARK - map tests
+
+function TableUtilsTestCase:test_map_empty_table()
+    local testable_table = {}
+
+    local result_table = table.map(testable_table, function (value) return value end)
+
+    return table.is_equal(result_table, {})
+end
+
+function TableUtilsTestCase:test_map_with_empty_callback()
+    local testable_table = {1, 2, 3, 4}
+
+    local result_table = table.map(testable_table, function (value) return value end)
+
+    return table.is_equal(result_table, testable_table)
+end
+
+function TableUtilsTestCase:test_map_elements_doubled()
+    local testable_table = {1, 2, 3, 4}
+
+    local result_table = table.map(testable_table, function (value) return value * 2 end)
+
+    return table.is_equal(result_table, {2, 4, 6, 8})
+end
+
+---@MARK - filter tests
+
+ function TableUtilsTestCase:test_filter_empty_table()
+    local testable_table = {}
+
+    local filtered_table = table.filter(testable_table, function (_) return true end)
+
+    return table.is_equal(filtered_table, {})
+end
+
+function TableUtilsTestCase:test_filter_table_with_no_callback()
+    local testable_table = {1, 2, 3, 4}
+
+    local filtered_table = table.filter(testable_table, function (_) return true end)
+
+    return table.is_equal(filtered_table, testable_table)
+end
+
+function TableUtilsTestCase:test_filter_table_for_even_numbers()
+    local testable_table = {1, 2, 3, 4}
+
+    local filtered_table = table.filter(testable_table, function (el) return el % 2 == 0  end)
+
+    return table.is_equal(filtered_table, {2, 4})
+end
+
 TableUtilsTestCase:run_tests()
