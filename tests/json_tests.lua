@@ -53,9 +53,21 @@ function JsonTestCase:test_decode_array()
 ]
 ]]
 
-    local decoded_object = Json.decode(str)
+    local decoded_object = Json.decode(str, JsonType.ARRAY)
 
     return decoded_object ~= nil and decoded_object[1]["string"] == "hello, world"
+end
+
+function JsonTestCase:test_decode_json_with_innter_array()
+    local str = [[
+{
+    "array": [1, 2, 3, 4, 5]
+}
+    ]]
+
+    local decoded_object = Json.decode(str)
+
+    return decoded_object ~= nil and #decoded_object.array == 5
 end
 
 ---@MARK - Encoder tests

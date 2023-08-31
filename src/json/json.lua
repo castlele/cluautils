@@ -5,14 +5,23 @@ JSON = require("JSON")
 
 Json = {}
 
----@param str string
----@return table?
-function Json.decode(str)
-    str = str:match("%b[]") or str:match("%b{}")
+---@enum JsonType
+JsonType = {
+    ARRAY = "%b[]",
+    DICTIONARY = "%b{}"
+}
 
-    if str == nil then
+---@param str string
+---@param outer_type JsonType?
+---@return table?
+function Json.decode(str, outer_type)
+    local s, e = str:find(outer_type or JsonType.DICTIONARY, nil, false)
+
+    if s == nil then
         return nil
     end
+
+    str = str:sub(s, e)
 
     local decoded_obj = JSON:decode(str)
 
