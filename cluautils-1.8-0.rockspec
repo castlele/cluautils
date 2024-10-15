@@ -1,8 +1,8 @@
 package = "cluautils"
-version = "1.7-2"
+version = "1.8-0"
 source = {
     url = "git+ssh://git@github.com/castlele/cluautils.git",
-    tag = "1.7.1"
+    tag = "1.8.0"
 }
 description = {
    homepage = "*** please enter a project homepage ***",
@@ -21,6 +21,7 @@ build = {
       ["cluautils.file_manager"] = "src/file_manager/file_manager.lua",
       ["cluautils.string_utils"] = "src/string_utils/string_utils.lua",
       ["cluautils.table_utils"] = "src/table_utils/table_utils.lua",
+      ["cluautils.functions"] = "src/functions/functions.lua",
    },
    copy_directories = {
       "tests"
