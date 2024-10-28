@@ -70,8 +70,8 @@ function exports.let(value, callback)
 end
 
 
-for name, exported_func in pairs(exports) do
-   M[name] = exported_func
+for name, exportedFunc in pairs(exports) do
+   M[name] = exportedFunc
 end
 
 return M
