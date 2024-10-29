@@ -1,3 +1,3 @@
 #!/bin/bash
 
-luacheck src/ tests/ > check_report.txt
+luacheck src/ tests/
