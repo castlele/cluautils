@@ -217,4 +217,14 @@ function TableUtilsTestCase:test_filter_table_for_even_numbers()
     return table.is_equal(filtered_table, {2, 4})
 end
 
+function TableUtilsTestCase:test_allocation_with_default_value()
+   local size = 50
+   local testable_table
+
+   testable_table = table.alloc(size, 0)
+
+   return #testable_table == size
+end
+
+
 TableUtilsTestCase:run_tests()

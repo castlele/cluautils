@@ -102,3 +102,17 @@ function table:map(callback)
 
     return result
 end
+
+---@generic T
+---@param size integer
+---@param defaultValue T
+---@return table<T>
+function table.alloc(size, defaultValue)
+   local t = {}
+
+   for i = 1, size do
+      t[i] = defaultValue
+   end
+
+   return t
+end
