@@ -90,8 +90,8 @@ function table:filter(callback)
     return result
 end
 
----@generic T
----@param callback fun(talbe_element: T):T
+---@generic T, U
+---@param callback fun(item: T): U
 ---@return table
 function table:map(callback)
     local result = {}
@@ -101,6 +101,19 @@ function table:map(callback)
     end
 
     return result
+end
+
+---@generic K, V, U
+---@param callback fun(key: K, value: V): U
+---@return table
+function table:mapkv(callback)
+   local t = {}
+
+   for key, value in pairs(self) do
+      table.insert(t, callback(key, value))
+   end
+
+   return t
 end
 
 ---@generic T

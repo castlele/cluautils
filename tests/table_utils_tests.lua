@@ -191,6 +191,14 @@ function TableUtilsTestCase:test_map_elements_doubled()
     return table.is_equal(result_table, {2, 4, 6, 8})
 end
 
+function TableUtilsTestCase:test_map_by_keyp_value_pairs()
+   local testable_table = { greeting = "hello", name = "world" }
+
+   local result = table.mapkv(testable_table, function (key, value) return key .. value end)
+
+   return #result == 2 and table.contains(result, "greetinghello") and table.contains(result, "nameworld")
+end
+
 ---@MARK - filter tests
 
  function TableUtilsTestCase:test_filter_empty_table()

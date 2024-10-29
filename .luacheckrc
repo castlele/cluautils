@@ -1,1 +1,5 @@
 self = false
+
+globals = {
+   "table",
+}
