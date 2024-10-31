@@ -19,9 +19,8 @@ t.describe("Linked list tests", function ()
       local list = { 1, 2, 3, 4, 5 }
       local sut = linkedList(list)
 
-      print(sut:len())
-      print(#sut)
+      local len = sut:len()
 
-      t.expect(#sut == #list)
+      t.expect(len == #list)
    end)
 end)

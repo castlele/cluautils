@@ -1,5 +1,6 @@
 ---@class LinkedList
 ---@field private rootNode ListNode?
+---@field private tailNode ListNode?
 local linkedList = {}
 
 ---@class ListNode
@@ -10,7 +11,7 @@ local node = {}
 
 
 ---@param t table?
----@return ListNode?
+---@return ListNode?, ListNode?
 local function wrapIntoNodeChain(t)
    if not t then
       return nil
@@ -35,16 +36,19 @@ local function wrapIntoNodeChain(t)
       end
    end
 
-   return root
+   return root, current
 end
 
 
 ---@param default table?
 ---@return LinkedList
 function linkedList:new(default)
+   local rootNode, tailNode = wrapIntoNodeChain(default)
+
    ---@type LinkedList
    local this = {
-      rootNode = wrapIntoNodeChain(default),
+      rootNode = rootNode,
+      tailNode = tailNode,
    }
 
    setmetatable(this, self)
@@ -54,6 +58,7 @@ function linkedList:new(default)
    return this
 end
 
+---TODO: Optimaze with private property
 ---@return integer
 function linkedList:len()
    local len = 0
@@ -91,7 +96,7 @@ function node:new(value, next)
 end
 
 
-return setmetatable(linkedList, {
-   __call = linkedList.new,
-   __len = function (self) linkedList.len(self) end,
+return setmetatable({}, {
+   __call = function (_, default) return linkedList:new(default) end,
+   __index = linkedList,
 })
