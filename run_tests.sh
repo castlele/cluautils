@@ -1,8 +1,9 @@
 #!/bin/bash
 
 tests_dir=./tests
+FILTER=$1
 
-for test_file in $tests_dir/*tests.lua; do
+for test_file in $tests_dir/${FILTER}tests.lua; do
     echo -e "\033[35mRunning tests for $test_file\033[0m"
 
     lua $test_file
