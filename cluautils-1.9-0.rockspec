@@ -1,8 +1,8 @@
 package = "cluautils"
-version = "1.8-0"
+version = "1.9-0"
 source = {
     url = "git+ssh://git@github.com/castlele/cluautils.git",
-    tag = "1.8.0"
+    tag = "1.9.0"
 }
 description = {
    homepage = "*** please enter a project homepage ***",
@@ -17,6 +17,7 @@ build = {
    modules = {
       ["cluautils"] = "src/cluautils.lua",
       ["cluautils.json"] = "src/json/json.lua",
+      ["cluautils.tests"] = "src/tests.lua",
       ["cluautils.tests.base_test_case"] = "src/tests/base_test_case.lua",
       ["cluautils.file_manager"] = "src/file_manager/file_manager.lua",
       ["cluautils.string_utils"] = "src/string_utils/string_utils.lua",
@@ -24,6 +25,7 @@ build = {
       ["cluautils.functions"] = "src/functions/functions.lua",
    },
    copy_directories = {
-      "tests"
+      "tests",
+      "examples",
    }
 }
