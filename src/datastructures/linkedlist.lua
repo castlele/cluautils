@@ -1,7 +1,7 @@
 ---@class LinkedList
 ---@field private rootNode ListNode?
 ---@field private tailNode ListNode?
-local linkedList = {}
+local LinkedList = {}
 
 ---@class ListNode
 ---@field value any
@@ -42,7 +42,7 @@ end
 
 ---@param default table?
 ---@return LinkedList
-function linkedList:new(default)
+function LinkedList:new(default)
    local rootNode, tailNode = wrapIntoNodeChain(default)
 
    ---@type LinkedList
@@ -60,7 +60,7 @@ end
 
 ---TODO: Optimaze with private property
 ---@return integer
-function linkedList:len()
+function LinkedList:len()
    local len = 0
    local currentNode = self.rootNode
 
@@ -72,8 +72,58 @@ function linkedList:len()
    return len
 end
 
-function linkedList:isEmpty()
+function LinkedList:isEmpty()
    return self.rootNode == nil
+end
+
+function LinkedList:valueIterator()
+   local currentNode = self.rootNode
+   local index = 0
+
+   return function ()
+      if not currentNode then
+         return nil
+      end
+
+      local value = currentNode.value
+
+      currentNode = currentNode.next
+      index = index + 1
+
+      return index, value
+   end
+end
+
+---@param item any
+---@param index integer
+function LinkedList:insert(item, index)
+   if not self.rootNode then
+      self.rootNode = node:new(item)
+      self.tailNode = self.rootNode
+   else
+      if self:len() < index then
+         local tail = assert(self.tailNode)
+
+         tail.next = node:new(item)
+         self.tailNode = tail.next
+      else
+         self:recursiveInsert(self.rootNode, 1, item, index)
+      end
+   end
+end
+
+---@private
+function LinkedList:recursiveInsert(currentNode, nodeIndex, item, itemIndex)
+   if not currentNode then return end
+
+   if nodeIndex + 1 == itemIndex then
+      local next = currentNode.next
+
+      currentNode.next = node:new(item)
+      currentNode.next.next = next
+   end
+
+   self:recursiveInsert(currentNode.next, nodeIndex + 1, item, itemIndex)
 end
 
 
@@ -97,6 +147,6 @@ end
 
 
 return setmetatable({}, {
-   __call = function (_, default) return linkedList:new(default) end,
-   __index = linkedList,
+   __call = function (_, default) return LinkedList:new(default) end,
+   __index = LinkedList,
 })
