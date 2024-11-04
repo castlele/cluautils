@@ -42,7 +42,11 @@ end
 tests.it = function(name, func)
    print("Test  " .. wrapWith(name, "'"))
 
-   if pcall(func) then
+   local isSuccess = xpcall(func, function (msg)
+      print(msg)
+   end)
+
+   if isSuccess then
       print(colorString(colorTable.GREEN, "Test " .. wrapWith(name, "'") .. " passed"))
    else
       print(colorString(colorTable.RED, "Test " .. wrapWith(name, "'") .. " failed"))
