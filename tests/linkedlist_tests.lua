@@ -76,4 +76,21 @@ t.describe("Linked list tests", function ()
       end
       t.expect(false)
    end)
+
+   t.it("Linked list can insert elements at the tail of the list", function()
+      local list = { 1, 2, 4, 5 }
+      local index = 3
+      local element = 3
+      local sut = LinkedList(list)
+
+      sut:insert(element, index)
+
+      for i, value in sut:valueIterator() do
+         if i == index then
+            t.expect(value == element)
+            return
+         end
+      end
+      t.expect(false)
+   end)
 end)

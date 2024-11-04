@@ -66,8 +66,6 @@ function LinkedList:new(default)
       len = #default
    end
 
-   print(rootNode)
-
    ---@type LinkedList
    local this = {
       rootNode = rootNode,
