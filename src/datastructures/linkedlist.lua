@@ -1,13 +1,14 @@
----@class LinkedList
----@field private rootNode ListNode?
----@field private tailNode ListNode?
-local LinkedList = {}
-
 ---@class ListNode
 ---@field value any
 ---@field next ListNode?
 ---@field parent ListNode?
-local node = {}
+local Node = {}
+
+---@class LinkedList
+---@filed private length integer
+---@field private rootNode ListNode?
+---@field private tailNode ListNode?
+local LinkedList = {}
 
 
 ---@param t table?
@@ -26,10 +27,10 @@ local function wrapIntoNodeChain(t)
 
    for _, value in pairs(t) do
       if not root then
-         root = node:new(value)
+         root = Node:new(value)
          prev = root
       else
-         current = node:new(value)
+         current = Node:new(value)
          current.parent = prev
          prev.next = current
          prev = current
@@ -39,30 +40,12 @@ local function wrapIntoNodeChain(t)
    return root, current
 end
 
-
----@param default table?
----@return LinkedList
-function LinkedList:new(default)
-   local rootNode, tailNode = wrapIntoNodeChain(default)
-
-   ---@type LinkedList
-   local this = {
-      rootNode = rootNode,
-      tailNode = tailNode,
-   }
-
-   setmetatable(this, self)
-
-   self.__index = self
-
-   return this
-end
-
----TODO: Optimaze with private property
+---TODO: Delete if this function is unused
+---@param node ListNode?
 ---@return integer
-function LinkedList:len()
+local function getNodeChainLen(node)
    local len = 0
-   local currentNode = self.rootNode
+   local currentNode = node
 
    while currentNode do
       len = len + 1
@@ -72,8 +55,39 @@ function LinkedList:len()
    return len
 end
 
+
+---@param default table?
+---@return LinkedList
+function LinkedList:new(default)
+   local rootNode, tailNode = wrapIntoNodeChain(default)
+   local len = 0
+
+   if default then
+      len = #default
+   end
+
+   print(rootNode)
+
+   ---@type LinkedList
+   local this = {
+      rootNode = rootNode,
+      tailNode = tailNode,
+      length = len,
+   }
+
+   setmetatable(this, self)
+
+   self.__index = self
+
+   return this
+end
+
 function LinkedList:isEmpty()
    return self.rootNode == nil
+end
+
+function LinkedList:len()
+   return self.length
 end
 
 function LinkedList:valueIterator()
@@ -98,18 +112,20 @@ end
 ---@param index integer
 function LinkedList:insert(item, index)
    if not self.rootNode then
-      self.rootNode = node:new(item)
+      self.rootNode = Node:new(item)
       self.tailNode = self.rootNode
    else
-      if self:len() < index then
+      if self:len() <= index then
          local tail = assert(self.tailNode)
 
-         tail.next = node:new(item)
+         tail.next = Node:new(item)
          self.tailNode = tail.next
       else
          self:recursiveInsert(self.rootNode, 1, item, index)
       end
    end
+
+   self.length = self.length + 1
 end
 
 ---@private
@@ -119,7 +135,7 @@ function LinkedList:recursiveInsert(currentNode, nodeIndex, item, itemIndex)
    if nodeIndex + 1 == itemIndex then
       local next = currentNode.next
 
-      currentNode.next = node:new(item)
+      currentNode.next = Node:new(item)
       currentNode.next.next = next
    end
 
@@ -130,7 +146,7 @@ end
 ---@param value any
 ---@param next ListNode?
 ---@return ListNode
-function node:new(value, next)
+function Node:new(value, next)
    ---@type ListNode
    local this = {
       value = value,
