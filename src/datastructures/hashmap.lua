@@ -1,6 +1,6 @@
 require("src.table_utils.table_utils")
 
----@class HashTable
+---@class HashMap
 ---@field private storage table
 ---@field private hashFunction fun(item: any): integer
 local hashTable = {}
@@ -24,11 +24,11 @@ end
 ---@param predefinedValues table?
 ---@param storage integer?
 ---@param hashFunction (fun(item: any): integer)?
----@return HashTable
+---@return HashMap
 function hashTable:new(predefinedValues, storage, hashFunction)
    storage = storage or 100
 
-   ---@type HashTable
+   ---@type HashMap
    local this = {
       storage = {},
       hashFunction = hashFunction or simpleHashFunction,

@@ -1,8 +1,8 @@
 package = "cluautils"
-version = "1.9-0"
+version = "1.10-1"
 source = {
     url = "git+ssh://git@github.com/castlele/cluautils.git",
-    tag = "1.9.0"
+    tag = "1.10.1"
 }
 description = {
    homepage = "*** please enter a project homepage ***",
@@ -16,6 +16,8 @@ build = {
    type = "builtin",
    modules = {
       ["cluautils"] = "src/cluautils.lua",
+      ["cluautils.datastructures.linkedlist"] = "src/datastructures/linkedlist.lua",
+      ["cluautils.datastructures.hashmap"] = "src/datastructures/hashmap.lua",
       ["cluautils.json"] = "src/json/json.lua",
       ["cluautils.tests"] = "src/tests.lua",
       ["cluautils.tests.base_test_case"] = "src/tests/base_test_case.lua",
