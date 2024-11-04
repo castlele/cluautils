@@ -93,4 +93,77 @@ t.describe("Linked list tests", function ()
       end
       t.expect(false)
    end)
+
+   t.it("Get element by index returns nil if list is empty", function ()
+      local index = 10
+      local sut = LinkedList()
+
+      local result = sut:get(index)
+
+      t.expect(result == nil)
+   end)
+
+   t.it("Get element by index returns value of the node with this index", function ()
+      local list = { 2, 4, 6, 8 }
+      local index = 3
+      local element = list[index]
+      local sut = LinkedList(list)
+
+      local result = sut:get(index)
+
+      t.expect(result == element)
+   end)
+
+   t.it("Linked list do nothing on removing from empty list with index", function ()
+      local index = 10
+      local sut = LinkedList()
+
+      local result = sut:remove(index)
+
+      t.expect(result == nil)
+   end)
+
+   t.it("Linked list can remove single element", function ()
+      local list = { 10 }
+      local index = 1
+      local element = list[index]
+      local sut = LinkedList(list)
+
+      local result = sut:remove(index)
+
+      t.expect(result == element and sut:isEmpty() and sut:len() == 0)
+   end)
+
+   t.it("Linked list can remove root element", function ()
+      local list = { 20, 10 }
+      local index = 1
+      local element = list[index]
+      local sut = LinkedList(list)
+
+      local result = sut:remove(index)
+
+      t.expect(result == element and sut:len() == #list - 1)
+   end)
+
+   t.it("Linked list can remove tail element", function ()
+      local list = { 20, 10 }
+      local index = 2
+      local element = list[index]
+      local sut = LinkedList(list)
+
+      local result = sut:remove(index)
+
+      t.expect(result == element and sut:len() == #list - 1)
+   end)
+
+   t.it("Linked list can remove elements from the middle of the list", function ()
+      local list = { 10, 20, 30, 40, 50 }
+      local index = 3
+      local element = list[index]
+      local sut = LinkedList(list)
+
+      local result = sut:remove(index)
+
+      t.expect(result == element and sut:len() == #list - 1)
+   end)
 end)

@@ -106,6 +106,20 @@ function LinkedList:valueIterator()
    end
 end
 
+---TODO: This method can be optimized using tailNode
+---@param index integer
+---@return any?
+function LinkedList:get(index)
+   local node = self:getNode(index)
+
+   if node then
+      return node.value
+   end
+
+   return nil
+end
+
+---TODO: This method can be optimized using tailNode
 ---@param item any
 ---@param index integer
 function LinkedList:insert(item, index)
@@ -126,7 +140,49 @@ function LinkedList:insert(item, index)
    self.length = self.length + 1
 end
 
+---TODO: This method can be optimized using tailNode
+---@param index integer
+---@return any?
+function LinkedList:remove(index)
+   if index == 1 and self.rootNode then
+      local value = self.rootNode.value
+      self.rootNode = nil
+      self.tailNode = nil
+      self.length = self.length - 1
+
+      return value
+   end
+
+   if index == self:len() and self.tailNode then
+      local value = self.tailNode.value
+      self.tailNode.parent.next = nil
+      self.tailNode = nil
+      self.length = self.length - 1
+
+      return value
+   end
+
+   local node = self:getNode(index)
+
+   if not node then
+      return nil
+   end
+
+   local next = node.next
+   local prev = node.parent
+
+   prev.next = next
+   next.parent = prev
+   self.length = self.length - 1
+
+   return node.value
+end
+
 ---@private
+---@param currentNode ListNode?
+---@param nodeIndex integer
+---@param item any
+---@param itemIndex integer
 function LinkedList:recursiveInsert(currentNode, nodeIndex, item, itemIndex)
    if not currentNode then return end
 
@@ -138,6 +194,29 @@ function LinkedList:recursiveInsert(currentNode, nodeIndex, item, itemIndex)
    end
 
    self:recursiveInsert(currentNode.next, nodeIndex + 1, item, itemIndex)
+end
+
+---@private
+---@param index integer
+---@return ListNode?
+function LinkedList:getNode(index)
+   if index > self:len() then
+      return nil
+   end
+
+   local currentNode = self.rootNode
+   local currentIndex = 1
+
+   while currentNode do
+      if currentIndex == index then
+         break
+      end
+
+      currentNode = currentNode.next
+      currentIndex = currentIndex + 1
+   end
+
+   return currentNode
 end
 
 
