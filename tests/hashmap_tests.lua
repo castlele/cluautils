@@ -65,4 +65,24 @@ t.describe("Hash Map tests", function ()
 
       t.expect(result and sut:get(key) == nil)
    end)
+
+   t.it("Hash map can resolve conflicts", function ()
+      local key1 = "cat"
+      local value1 = "Javie"
+      local key2 = "dog"
+      local value2 = "Shanty"
+      local predefinedValues = {
+         [key1] = value1,
+         [key2] = value2,
+      }
+      local sut = HashMap(predefinedValues)
+
+      local result1 = sut:get(key1)
+      print(result1)
+      local result2 = sut:get(key2)
+      print(result2)
+
+      t.expect(result1 == value1)
+      t.expect(result2 == value2)
+   end)
 end)
