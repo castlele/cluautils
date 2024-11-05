@@ -3,7 +3,7 @@ require("cluautils.table_utils")
 ---@class HashMap
 ---@field private storage table
 ---@field private hashFunction fun(item: any): integer
-local hashTable = {}
+local HashMap = {}
 
 
 ---@param item any
@@ -25,7 +25,7 @@ end
 ---@param storage integer?
 ---@param hashFunction (fun(item: any): integer)?
 ---@return HashMap
-function hashTable:new(predefinedValues, storage, hashFunction)
+function HashMap:new(predefinedValues, storage, hashFunction)
    storage = storage or 100
 
    ---@type HashMap
@@ -55,13 +55,13 @@ function hashTable:new(predefinedValues, storage, hashFunction)
 end
 
 ---@return boolean
-function hashTable:isEmpty()
+function HashMap:isEmpty()
    return table.is_empty(self.storage)
 end
 
 ---@param key any
 ---@param value any
-function hashTable:put(key, value)
+function HashMap:put(key, value)
    local index = self.hashFunction(key)
 
    -- WARN: This zero allocation will be removed after changing lua table to linked list
@@ -74,7 +74,7 @@ end
 
 ---@param key any
 ---@return any?
-function hashTable:get(key)
+function HashMap:get(key)
    local index = self.hashFunction(key)
 
    return self.storage[index]
@@ -82,7 +82,7 @@ end
 
 ---@param key any
 ---@return boolean
-function hashTable:remove(key)
+function HashMap:remove(key)
    local index = self.hashFunction(key)
    local value = self.storage[index]
 
@@ -97,6 +97,6 @@ end
 
 
 return setmetatable({}, {
-   __call = hashTable.new,
-   __index = hashTable,
+   __call = HashMap.new,
+   __index = HashMap,
 })
