@@ -5,10 +5,12 @@
 local Node = {}
 
 ---@class LinkedList
----@filed private length integer
+---@field private length integer
 ---@field private rootNode ListNode?
 ---@field private tailNode ListNode?
-local LinkedList = {}
+local LinkedList = {
+   __type = "LinkedList",
+}
 
 
 ---@param t table?
@@ -117,6 +119,20 @@ function LinkedList:get(index)
    end
 
    return nil
+end
+
+---@param callback fun(item: any): boolean
+---@return table
+function LinkedList:filter(callback)
+   local result = {}
+
+   for _, item in self:valueIterator() do
+      if callback(item) then
+         table.insert(result, item)
+      end
+   end
+
+   return result
 end
 
 ---TODO: This method can be optimized using tailNode

@@ -1,3 +1,4 @@
+require("cluautils.table_utils")
 local t = require("src.tests")
 local LinkedList = require("src.datastructures.linkedlist")
 
@@ -165,5 +166,24 @@ t.describe("Linked list tests", function ()
       local result = sut:remove(index)
 
       t.expect(result == element and sut:len() == #list - 1)
+   end)
+
+   t.it("Filtering empty linked list returns empty table", function ()
+      local sut = LinkedList()
+
+      local result = sut:filter(function (_) return true end)
+
+      t.expect(table.is_empty(result))
+   end)
+
+   t.it("Linked list can filter its notes returning table of values", function ()
+      local filterCallback = function (item) return item % 2 == 0 end
+      local list = { 1, 2, 3, 4, 5, 6 }
+      local expectedList = table.filter(list, filterCallback)
+      local sut = LinkedList(list)
+
+      local result = sut:filter(filterCallback)
+
+      t.expect(table.is_equal(expectedList, result))
    end)
 end)
