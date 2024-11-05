@@ -43,7 +43,9 @@ tests.it = function(name, func)
    print("Test  " .. wrapWith(name, "'"))
 
    local isSuccess = xpcall(func, function (msg)
-      print(msg)
+      if msg then
+         print(msg)
+      end
    end)
 
    if isSuccess then

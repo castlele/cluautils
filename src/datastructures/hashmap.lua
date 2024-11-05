@@ -1,6 +1,7 @@
 require("cluautils.table_utils")
 
 ---@class HashMap
+---@field private length integer
 ---@field private storage table
 ---@field private hashFunction fun(item: any): integer
 local HashMap = {}
@@ -22,32 +23,26 @@ end
 
 
 ---@param predefinedValues table?
----@param storage integer?
+---@param capacity integer?
 ---@param hashFunction (fun(item: any): integer)?
 ---@return HashMap
-function HashMap:new(predefinedValues, storage, hashFunction)
-   storage = storage or 100
+function HashMap:new(predefinedValues, capacity, hashFunction)
+   capacity = capacity
 
    ---@type HashMap
    local this = {
+      length = capacity or 0,
       storage = {},
       hashFunction = hashFunction or simpleHashFunction,
    }
 
-   if predefinedValues then
-      table.foreach(predefinedValues, function (key, value)
-         local index = this.hashFunction(key)
-
-         -- WARN: This zero allocation will be removed after changing lua table to linked list
-         if #this.storage < index then
-            this.storage = table.alloc(index, 0)
-         end
-
-         this.storage[index] = value
-      end)
-   end
-
    setmetatable(this, self)
+
+   if predefinedValues then
+      for key, value in pairs(predefinedValues) do
+         this:put(key, value)
+      end
+   end
 
    self.__index = self
 
@@ -56,7 +51,7 @@ end
 
 ---@return boolean
 function HashMap:isEmpty()
-   return table.is_empty(self.storage)
+   return self.length == 0
 end
 
 ---@param key any
@@ -64,12 +59,8 @@ end
 function HashMap:put(key, value)
    local index = self.hashFunction(key)
 
-   -- WARN: This zero allocation will be removed after changing lua table to linked list
-   if #self.storage < index then
-      self.storage = table.alloc(index, 0)
-   end
-
    self.storage[index] = value
+   self.length = self.length + 1
 end
 
 ---@param key any
@@ -88,6 +79,7 @@ function HashMap:remove(key)
 
    if value then
       self.storage[index] = nil
+      self.length = self.length - 1
 
       return true
    end
