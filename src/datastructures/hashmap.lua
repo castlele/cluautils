@@ -96,4 +96,7 @@ function hashTable:remove(key)
 end
 
 
-return hashTable
+return setmetatable({}, {
+   __call = hashTable.new,
+   __index = hashTable,
+})

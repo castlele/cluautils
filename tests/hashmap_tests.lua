@@ -1,73 +1,68 @@
-require("src.tests.base_test_case")
+local t = require("src.tests")
 local HashMap = require("src.datastructures.hashmap")
 
+t.describe("Hash Map tests", function ()
+   t.it("test_init_method_creates_empty_table", function ()
+      local sut = HashMap()
 
-HashMapTestCase = CTestCase
+      t.expect(sut:isEmpty())
+   end)
 
+   t.it("test_init_method_with_predefined_elements_places_it_in_the_table", function ()
+      local predefinedValues = { greeting = "hello", main = "world"}
+      local sut = HashMap(predefinedValues)
 
-function HashMapTestCase:test_init_method_creates_empty_table()
-   local sut = HashMap:new()
+      t.expect(not sut:isEmpty())
+   end)
 
-   return sut:isEmpty()
-end
+   t.it("test_put_method_stores_item_in_the_table", function ()
+      local key = "greeting"
+      local value = "hello"
+      local storage = 100
+      local sut = HashMap:new(nil, storage)
 
-function HashMapTestCase:test_init_method_with_predefined_elements_places_it_in_the_table()
-   local predefinedValues = { greeting = "hello", main = "world"}
-   local sut = HashMap:new(predefinedValues)
+      sut:put(key, value)
 
-   return sut:isEmpty() == false
-end
+      t.expect(not sut:isEmpty())
+   end)
 
-function HashMapTestCase:test_put_method_stores_item_in_the_table()
-   local key = "greeting"
-   local value = "hello"
-   local storage = 100
-   local sut = HashMap:new(nil, storage)
+   t.it("test_get_method_in_empty_table", function ()
+      local key = "greeting"
+      local sut = HashMap:new()
 
-   sut:put(key, value)
+      local result = sut:get(key)
 
-   return sut:isEmpty() == false
-end
+      t.expect(result == nil)
+   end)
 
-function HashMapTestCase:test_get_method_in_empty_table()
-   local key = "greeting"
-   local sut = HashMap:new()
+   t.it("test_get_method_in_non_empty_table", function ()
+      local key = "greeting"
+      local value = "hello"
+      local predefinedValues = { [key] = value }
+      local sut = HashMap:new(predefinedValues)
 
-   local result = sut:get(key)
+      local result = sut:get(key)
 
-   return result == nil
-end
+      t.expect(result == value)
+   end)
 
-function HashMapTestCase:test_get_method_in_non_empty_table()
-   local key = "greeting"
-   local value = "hello"
-   local predefinedValues = { [key] = value }
-   local sut = HashMap:new(predefinedValues)
+   t.it("test_remove_from_empty_table", function ()
+      local key = "greeting"
+      local sut = HashMap:new()
 
-   local result = sut:get(key)
+      local result = sut:remove(key)
 
-   return result == value
-end
+      t.expect(result == false)
+   end)
 
-function HashMapTestCase:test_remove_from_empty_table()
-   local key = "greeting"
-   local sut = HashMap:new()
+   t.it("test_remove_from_none_empty_table", function ()
+      local key = "greeting"
+      local value = "hello"
+      local predefinedValues = { [key] = value }
+      local sut = HashMap:new(predefinedValues)
 
-   local result = sut:remove(key)
+      local result = sut:remove(key)
 
-   return result == false
-end
-
-function HashMapTestCase:test_remove_from_none_empty_table()
-   local key = "greeting"
-   local value = "hello"
-   local predefinedValues = { [key] = value }
-   local sut = HashMap:new(predefinedValues)
-
-   local result = sut:remove(key)
-
-   return result and sut:get(key) == nil
-end
-
-
-HashMapTestCase:run_tests()
+      t.expect(result and sut:get(key) == nil)
+   end)
+end)
