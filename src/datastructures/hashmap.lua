@@ -1,5 +1,5 @@
 require("cluautils.table_utils")
-local LinkedList = require("cluautils.datastructures.linkedlist")
+local LinkedList = require("src.datastructures.linkedlist")
 local Pair = require("src.datastructures.pair")
 
 ---@class HashMap
@@ -72,8 +72,14 @@ function HashMap:put(key, value)
       return
    end
 
-   self.storage = LinkedList({
-      existingValue, Pair(key, value)
+   if existingValue.__type == "LinkedList" then
+      existingValue:append(Pair(key, value))
+      return
+   end
+
+   self.storage[index] = LinkedList({
+      existingValue,
+      Pair(key, value),
    })
 end
 
@@ -86,7 +92,15 @@ function HashMap:get(key)
 
    if value then
       if value.__type == "LinkedList" then
-         value:find
+         local pair = value:first(function (item)
+            return item.left == key
+         end)
+
+         if not pair then
+            return nil
+         end
+
+         return pair.right
       end
 
       return value.right
