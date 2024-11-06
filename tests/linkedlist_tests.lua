@@ -92,7 +92,24 @@ t.describe("Linked list tests", function ()
             return
          end
       end
-      t.expect(false)
+      t.expect(false, "No item found: " .. element)
+   end)
+
+   t.it("Append puts element at the tail of the linked list", function ()
+      local list = { 1, 2, 3, 4 }
+      local index = #list + 1
+      local element = 5
+      local sut = LinkedList(list)
+
+      sut:append(element)
+
+      for i, value in sut:valueIterator() do
+         if i == index then
+            t.expect(value == element)
+            return
+         end
+      end
+      t.expect(false, "No item found: " .. element)
    end)
 
    t.it("Get element by index returns nil if list is empty", function ()
@@ -185,5 +202,38 @@ t.describe("Linked list tests", function ()
       local result = sut:filter(filterCallback)
 
       t.expect(table.is_equal(expectedList, result))
+   end)
+
+   t.it("First returns nil if linked list is empty", function ()
+      local predicate = function (item) return item == 10 end
+      local list = {}
+      local expectedItem = nil
+      local sut = LinkedList(list)
+
+      local result = sut:first(predicate)
+
+      t.expect(result == expectedItem)
+   end)
+
+   t.it("Linked list returns nil if no value in the list matching the predicate", function ()
+      local predicate = function (item) return item == 10 end
+      local list = { 20, 30, 40, 50, 60 }
+      local expectedItem = nil
+      local sut = LinkedList(list)
+
+      local result = sut:first(predicate)
+
+      t.expect(result == expectedItem)
+   end)
+
+   t.it("Linked list returns a first value matching the predicate", function ()
+      local predicate = function (item) return item == 10 end
+      local list = {20, 30, 10, 40, 50, 100 }
+      local expectedItem = list[3]
+      local sut = LinkedList(list)
+
+      local result = sut:first(predicate)
+
+      t.expect(result == expectedItem)
    end)
 end)

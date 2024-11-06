@@ -135,6 +135,18 @@ function LinkedList:filter(callback)
    return result
 end
 
+---@param predicate fun(item: any): boolean
+---@return any?
+function LinkedList:first(predicate)
+   for _, item in self:valueIterator() do
+      if predicate(item) then
+         return item
+      end
+   end
+
+   return nil
+end
+
 ---TODO: This method can be optimized using tailNode
 ---@param item any
 ---@param index integer
@@ -154,6 +166,11 @@ function LinkedList:insert(item, index)
    end
 
    self.length = self.length + 1
+end
+
+---@param item any
+function LinkedList:append(item)
+   self:insert(item, self:len() + 1)
 end
 
 ---TODO: This method can be optimized using tailNode
