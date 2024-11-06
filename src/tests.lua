@@ -10,6 +10,7 @@ local colorTable = {
    YELLOW = 33,
    GREEN = 32,
 }
+local currentResults = {}
 
 
 ---@param color ColorTable
@@ -37,11 +38,17 @@ end
 tests.describe = function(label, func)
    print(colorString(colorTable.YELLOW, "Test cases: " .. wrapWith(label, "'")))
    func()
+
+   for _, value in pairs(currentResults) do
+      if not value then
+         print(colorString(colorTable.RED, "Test cases failed: " .. wrapWith(label, "'")))
+         return
+      end
+   end
+      print(colorString(colorTable.YELLOW, "Test cases succeeded: " .. wrapWith(label, "'")))
 end
 
 tests.it = function(name, func)
-   print("Test  " .. wrapWith(name, "'"))
-
    local isSuccess = xpcall(func, function (msg)
       if msg then
          print(msg)
@@ -50,8 +57,10 @@ tests.it = function(name, func)
 
    if isSuccess then
       print(colorString(colorTable.GREEN, "Test " .. wrapWith(name, "'") .. " passed"))
+      currentResults[name] = true
    else
       print(colorString(colorTable.RED, "Test " .. wrapWith(name, "'") .. " failed"))
+      currentResults[name] = false
    end
 end
 
