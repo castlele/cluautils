@@ -35,7 +35,7 @@ t.describe("Linked list tests", function ()
    end)
 
    t.it("Linked list can insert element at index zero if there are no elements", function ()
-      local index = 0
+      local index = 1
       local element = 10
       local sut = LinkedList()
 
@@ -331,5 +331,21 @@ t.describe("Linked list operations", function ()
       t.expect(result1 == 2, "Invalid element at index 2. Expected: 2, got: " .. result1)
       t.expect(result2 == 2, "Invalid element at index 2. Expected: 2, got: " .. result2)
       t.expect(result3 == 3, "Invalid element at index 2. Expected: 3, got: " .. result3)
+   end)
+
+   t.it("Test case 2", function ()
+      local sut = LinkedList()
+
+      sut:append(3)
+      sut:insert(2, 1)
+      sut:insert(1, 1)
+
+      local result1 = sut:get(1)
+      local result2 = sut:get(2)
+      local result3 = sut:get(3)
+
+      t.expect(result1 == 1, "Expect: 1, got: " .. result1)
+      t.expect(result2 == 2, "Expect: 2, got: " .. result2)
+      t.expect(result3 == 3, "Expect: 3, got: " .. result3)
    end)
 end)

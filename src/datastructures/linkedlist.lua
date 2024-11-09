@@ -42,21 +42,6 @@ local function wrapIntoNodeChain(t)
    return root, current
 end
 
----TODO: Delete if this function is unused
----@param node ListNode?
----@return integer
-local function getNodeChainLen(node)
-   local len = 0
-   local currentNode = node
-
-   while currentNode do
-      len = len + 1
-      currentNode = currentNode.next
-   end
-
-   return len
-end
-
 
 ---@param default table?
 ---@return LinkedList
@@ -164,19 +149,29 @@ end
 ---@param item any
 ---@param index integer
 function LinkedList:insert(item, index)
-   if not self.rootNode then
-      self.rootNode = Node:new(item)
-      self.tailNode = self.rootNode
-   else
-      if self:len() < index then
-         local tail = assert(self.tailNode)
+   if index == 1 then
+      local newNode = Node:new(item)
 
-         tail.next = Node:new(item)
-         tail.next.parent = tail
-         self.tailNode = tail.next
+      if self.rootNode then
+         newNode.next = self.rootNode
+         self.rootNode.parent = newNode
+         self.rootNode = newNode
       else
-         self:recursiveInsert(self.rootNode, 1, item, index)
+         self.rootNode = newNode
+         self.tailNode = self.rootNode
       end
+   elseif index > self:len() then
+      local newNode = Node:new(item)
+
+      if self.tailNode then
+         self.tailNode.next = newNode
+         newNode.parent = self.tailNode
+         self.tailNode = newNode
+      else
+         self:insert(item, 1)
+      end
+   else
+      self:recursiveInsert(self.rootNode, 1, item, index)
    end
 
    self.length = self.length + 1
