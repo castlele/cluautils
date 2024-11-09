@@ -135,6 +135,19 @@ function LinkedList:filter(callback)
    return result
 end
 
+---@generic T, U
+---@param callback fun(item: T): U
+---@return LinkedList
+function LinkedList:map(callback)
+   local result = LinkedList:new()
+
+   for _, item in self:valueIterator() do
+      result:append(callback(item))
+   end
+
+   return result
+end
+
 ---@param predicate fun(item: any): boolean
 ---@return any?
 function LinkedList:first(predicate)

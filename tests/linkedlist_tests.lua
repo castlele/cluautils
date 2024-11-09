@@ -231,6 +231,36 @@ t.describe("Linked list tests", function ()
       t.expect(table.is_equal(expectedList, result))
    end)
 
+   t.it("Map function has no effect on empty list", function ()
+      local mapFunc = function (item) return item end
+      local sut = LinkedList()
+
+      local result = sut:map(mapFunc):toTable()
+
+      t.expect(table.is_empty(result))
+   end)
+
+   t.it("Map function that returns the same item has no effect on original linked list order and elements", function ()
+      local mapFunc = function (item) return item end
+      local list = { 1, 2, 3, 4, 5 }
+      local sut = LinkedList(list)
+
+      local result = sut:map(mapFunc):toTable()
+
+      t.expect(table.is_equal(list, result))
+   end)
+
+   t.it("Map function can return new values", function ()
+      local mapFunc = function (item) return item * 2 end
+      local list = { 1, 2, 3, 4, 5 }
+      local expectedList = table.map(list, mapFunc)
+      local sut = LinkedList(list)
+
+      local result = sut:map(mapFunc):toTable()
+
+      t.expect(table.is_equal(expectedList, result))
+   end)
+
    t.it("First returns nil if linked list is empty", function ()
       local predicate = function (item) return item == 10 end
       local list = {}
