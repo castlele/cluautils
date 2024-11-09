@@ -155,10 +155,11 @@ function LinkedList:insert(item, index)
       self.rootNode = Node:new(item)
       self.tailNode = self.rootNode
    else
-      if self:len() <= index then
+      if self:len() < index then
          local tail = assert(self.tailNode)
 
          tail.next = Node:new(item)
+         tail.next.parent = tail
          self.tailNode = tail.next
       else
          self:recursiveInsert(self.rootNode, 1, item, index)
@@ -211,6 +212,23 @@ function LinkedList:remove(index)
    return node.value
 end
 
+---@return string
+function LinkedList:toString()
+   local description = ""
+   for index, value in self:valueIterator() do
+      local back = ""
+      local prevNode = self:getNode(index - 1)
+
+      if prevNode and prevNode.next.value == value then
+         back = "<"
+      end
+
+      description = description .. "{" .. index .. "; " .. value .. "} " .. back .. "-> "
+   end
+
+   return description
+end
+
 ---@private
 ---@param currentNode ListNode?
 ---@param nodeIndex integer
@@ -220,10 +238,12 @@ function LinkedList:recursiveInsert(currentNode, nodeIndex, item, itemIndex)
    if not currentNode then return end
 
    if nodeIndex + 1 == itemIndex then
-      local next = currentNode.next
+      local newNode = Node:new(item)
 
-      currentNode.next = Node:new(item)
-      currentNode.next.next = next
+      newNode.next = currentNode.next
+      newNode.parent = currentNode
+
+      currentNode.next = newNode
    end
 
    self:recursiveInsert(currentNode.next, nodeIndex + 1, item, itemIndex)

@@ -237,3 +237,25 @@ t.describe("Linked list tests", function ()
       t.expect(result == expectedItem)
    end)
 end)
+
+t.describe("Linked list operations", function ()
+   t.it("Test case 1", function ()
+      -- ["MyLinkedList", "addAtHead", "addAtTail", "addAtIndex", "get", "deleteAtIndex", "get"]
+      -- Input:
+      -- [[], [1], [3], [1, 2], [1], [1], [1]]
+      -- Output:
+      -- [null, null, null, null, 2, null, 3]
+      local sut = LinkedList()
+      sut:insert(1, 1)
+      sut:append(3)
+      sut:insert(2, 2)
+
+      local result1 = sut:get(2)
+      local result2 = sut:remove(2)
+      local result3 = sut:get(2)
+
+      t.expect(result1 == 2, "Invalid element at index 2. Expected: 2, got: " .. result1)
+      t.expect(result2 == 2, "Invalid element at index 2. Expected: 2, got: " .. result2)
+      t.expect(result3 == 3, "Invalid element at index 2. Expected: 3, got: " .. result3)
+   end)
+end)
