@@ -237,6 +237,21 @@ t.describe("Linked list tests", function ()
 end)
 
 t.describe("Linked list functional programming tests", function ()
+   t.it("Functional methods of linked list can be chained together", function ()
+      local filteringFunc = function (item) return item % 2 == 0 end
+      local mapFunc = function (item) return tostring(item) end
+      local list = { 1, 2, 3, 4, 5, 6 }
+      local expectedList = table.map(table.filter(list, filteringFunc), mapFunc)
+      local sut = LinkedList(list)
+
+      local result = sut
+         :filter(filteringFunc)
+         :map(mapFunc)
+         :toTable()
+
+      t.expect(table.is_equal(expectedList, result))
+   end)
+
    t.it("Filtering empty linked list returns empty table", function ()
       local sut = LinkedList()
 
