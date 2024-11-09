@@ -122,13 +122,13 @@ function LinkedList:get(index)
 end
 
 ---@param callback fun(item: any): boolean
----@return table
+---@return LinkedList
 function LinkedList:filter(callback)
-   local result = {}
+   local result = LinkedList:new()
 
    for _, item in self:valueIterator() do
       if callback(item) then
-         table.insert(result, item)
+         result:append(item)
       end
    end
 
@@ -212,6 +212,16 @@ function LinkedList:remove(index)
    return node.value
 end
 
+function LinkedList:toTable()
+   local result = {}
+
+   for _, value in self:valueIterator() do
+      table.insert(result, value)
+   end
+
+   return result
+end
+
 ---@return string
 function LinkedList:toString()
    local description = ""
@@ -219,6 +229,9 @@ function LinkedList:toString()
       local back = ""
       local prevNode = self:getNode(index - 1)
 
+      ---BUG: This part do not work for second elements
+      ---Resulting in the one-side relationship between two elements
+      ---According to other tests this is actually impossible
       if prevNode and prevNode.next.value == value then
          back = "<"
       end

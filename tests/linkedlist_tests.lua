@@ -185,12 +185,39 @@ t.describe("Linked list tests", function ()
       t.expect(result == element and sut:len() == #list - 1)
    end)
 
+   t.it("Convertion to table from empty linked list results in empty table", function ()
+      local sut = LinkedList()
+
+      local result = sut:toTable()
+
+      t.expect(table.is_empty(result))
+   end)
+
+   t.it("Convertion to table from NONE empty linked list results in table representation", function ()
+      local list = { 1, 2, 3, 4, 5, 6 }
+      local sut = LinkedList(list)
+
+      local result = sut:toTable()
+
+      t.expect(table.is_equal(result, list))
+   end)
+
    t.it("Filtering empty linked list returns empty table", function ()
       local sut = LinkedList()
 
-      local result = sut:filter(function (_) return true end)
+      local result = sut:filter(function (_) return true end):toTable()
 
       t.expect(table.is_empty(result))
+   end)
+
+   t.it("Empty filtering should return the same list items in the same order", function ()
+      local filterCallback = function (_) return true end
+      local list = { 1, 2, 3, 4, 5, 6 }
+      local sut = LinkedList(list)
+
+      local result = sut:filter(filterCallback):toTable()
+
+      t.expect(table.is_equal(list, result))
    end)
 
    t.it("Linked list can filter its notes returning table of values", function ()
@@ -199,7 +226,7 @@ t.describe("Linked list tests", function ()
       local expectedList = table.filter(list, filterCallback)
       local sut = LinkedList(list)
 
-      local result = sut:filter(filterCallback)
+      local result = sut:filter(filterCallback):toTable()
 
       t.expect(table.is_equal(expectedList, result))
    end)
