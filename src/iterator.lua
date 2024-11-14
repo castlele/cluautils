@@ -16,7 +16,7 @@ end
 
 ---@param range Range
 ---@return number?, number?
-local range_gen = function(range, state)
+local rangeGen = function(range, state)
    local currentState = state + range.step
 
    if state >= range.stop then
@@ -26,11 +26,38 @@ local range_gen = function(range, state)
    return currentState, currentState
 end
 
-local call_if_not_empty = function(fun, state, ...)
-   if state == nil then
+---@class MapParam
+---@field gen fun(param: any, state: any): any
+---@field param any
+---@field callback fun(item: any): any
+---@param param MapParam
+---@param state any
+---@return any?, any?
+local function mapGen(param, state)
+   local currentState, newState = param.gen(param.param, state)
+
+   if not currentState then
       return nil
    end
-   return state, fun(...)
+
+   return currentState, param.callback(newState)
+end
+
+local function filterGen(param, state)
+   local result = false
+   local currentState, newState
+
+   repeat
+      currentState, newState = param.gen(param.param, newState or state)
+
+      if not currentState then
+         return nil
+      end
+
+      result = param.callback(newState)
+   until result
+
+   return currentState, newState
 end
 
 
@@ -41,17 +68,41 @@ end
 function Iterator.range(start, stop, step)
    local range = Range(start, stop, step or 1)
 
-   return wrap(range_gen, range, start - (step or 1))
+   return wrap(rangeGen, range, start - (step or 1))
 end
 
 
 ---@return any?
 function Iterator:next()
-   local state = self.gen(self.param, self.state)
+   local state, newstate = self.gen(self.param, self.state)
 
    self.state = state
 
-   return state
+   return newstate
+end
+
+---@param callback fun(item: any): any
+---@return Iterator
+function Iterator:map(callback)
+   ---@type MapParam
+   local param = {
+      callback = callback,
+      param = self.param,
+      gen = self.gen,
+   }
+
+   return wrap(mapGen, param, self.state)
+end
+
+---@param callback fun(item: any): boolean
+---@return Iterator
+function Iterator:filter(callback)
+   local param = {
+      callback = callback,
+      param = self.param,
+      gen = self.gen,
+   }
+   return wrap(filterGen, param, self.state)
 end
 
 ---@param callback fun(item: any)
@@ -59,7 +110,12 @@ function Iterator:forEach(callback)
    local state = self.state
 
    repeat
-      state = call_if_not_empty(callback, self.gen(self.param, state))
+      local currentState, newState = self.gen(self.param, state)
+      state = currentState
+
+      if state then
+         callback(newState)
+      end
    until state == nil
 end
 
