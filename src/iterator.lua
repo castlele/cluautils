@@ -43,6 +43,13 @@ local function mapGen(param, state)
    return currentState, param.callback(newState)
 end
 
+---@class FilterGen
+---@field gen fun(param: any, state: any): any
+---@field param any
+---@field callback fun(item: any): any
+---@param param MapParam
+---@param state any
+---@return any?, any?
 local function filterGen(param, state)
    local result = false
    local currentState, newState
@@ -71,6 +78,27 @@ function Iterator.range(start, stop, step)
    return wrap(rangeGen, range, start - (step or 1))
 end
 
+---@param t table
+---@param index integer
+---@return any?, any?
+local function tableGen(t, index)
+   local currentIndex = index + 1
+
+   if currentIndex > #t then
+      return nil
+   end
+
+   local item = t[currentIndex]
+
+   return item, item
+end
+
+---@param t table
+---@return Iterator
+function Iterator.table(t)
+   return wrap(tableGen, t, 0)
+end
+
 
 ---@return any?
 function Iterator:next()
@@ -97,6 +125,7 @@ end
 ---@param callback fun(item: any): boolean
 ---@return Iterator
 function Iterator:filter(callback)
+   ---@type FilterGen
    local param = {
       callback = callback,
       param = self.param,
