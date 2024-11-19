@@ -118,4 +118,7 @@ t.describe("Iterator tests", function ()
 
       assertIteratorEqualToTable(result, expectedList)
    end)
+
+   t.it("Filter method can be chained with other methods while changing typekj", function ()
+   end)
 end)

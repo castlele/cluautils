@@ -1,3 +1,6 @@
+local Iterator = require("src.iterator")
+
+
 ---@class ListNode
 ---@field value any
 ---@field next ListNode?
@@ -75,6 +78,27 @@ function LinkedList:len()
    return self.length
 end
 
+---@return Iterator
+function LinkedList:iter()
+   local gen = function (param, state)
+      local currentNode
+
+      if not state then
+         currentNode = param.root
+      else
+         currentNode = state.next
+      end
+
+      if not currentNode then
+         return nil
+      end
+
+      return currentNode, currentNode
+   end
+
+   return Iterator.wrap(gen, { root = self.rootNode }, nil)
+end
+
 function LinkedList:valueIterator()
    local currentNode = self.rootNode
    local index = 0
@@ -104,33 +128,6 @@ function LinkedList:get(index)
    end
 
    return nil
-end
-
----@param callback fun(item: any): boolean
----@return LinkedList
-function LinkedList:filter(callback)
-   local result = LinkedList:new()
-
-   for _, item in self:valueIterator() do
-      if callback(item) then
-         result:append(item)
-      end
-   end
-
-   return result
-end
-
----@generic T, U
----@param callback fun(item: T): U
----@return LinkedList
-function LinkedList:map(callback)
-   local result = LinkedList:new()
-
-   for _, item in self:valueIterator() do
-      result:append(callback(item))
-   end
-
-   return result
 end
 
 ---@param predicate fun(item: any): boolean

@@ -238,16 +238,22 @@ end)
 
 t.describe("Linked list functional programming tests", function ()
    t.it("Functional methods of linked list can be chained together", function ()
-      local filteringFunc = function (item) return item % 2 == 0 end
+      local convertFromNodeToNum = function (node) return node.value end
+      local filteringFunc = function (item)
+         return item % 2 == 0
+      end
       local mapFunc = function (item) return tostring(item) end
       local list = { 1, 2, 3, 4, 5, 6 }
       local expectedList = table.map(table.filter(list, filteringFunc), mapFunc)
       local sut = LinkedList(list)
 
       local result = sut
+         :iter()
+         :map(convertFromNodeToNum)
          :filter(filteringFunc)
-         :map(mapFunc)
-         :toTable()
+      -- :forEach(print)
+         -- :map(mapFunc)
+         -- :toList()
 
       t.expect(table.is_equal(expectedList, result))
    end)
@@ -255,7 +261,7 @@ t.describe("Linked list functional programming tests", function ()
    t.it("Filtering empty linked list returns empty table", function ()
       local sut = LinkedList()
 
-      local result = sut:filter(function (_) return true end):toTable()
+      local result = sut:iter():filter(function (_) return true end):toList()
 
       t.expect(table.is_empty(result))
    end)
@@ -265,7 +271,7 @@ t.describe("Linked list functional programming tests", function ()
       local list = { 1, 2, 3, 4, 5, 6 }
       local sut = LinkedList(list)
 
-      local result = sut:filter(filterCallback):toTable()
+      local result = sut:iter():filter(filterCallback):toList()
 
       t.expect(table.is_equal(list, result))
    end)
@@ -276,7 +282,7 @@ t.describe("Linked list functional programming tests", function ()
       local expectedList = table.filter(list, filterCallback)
       local sut = LinkedList(list)
 
-      local result = sut:filter(filterCallback):toTable()
+      local result = sut:iter():filter(filterCallback):toList()
 
       t.expect(table.is_equal(expectedList, result))
    end)
@@ -285,7 +291,7 @@ t.describe("Linked list functional programming tests", function ()
       local mapFunc = function (item) return item end
       local sut = LinkedList()
 
-      local result = sut:map(mapFunc):toTable()
+      local result = sut:iter():map(mapFunc):toList()
 
       t.expect(table.is_empty(result))
    end)
@@ -295,7 +301,7 @@ t.describe("Linked list functional programming tests", function ()
       local list = { 1, 2, 3, 4, 5 }
       local sut = LinkedList(list)
 
-      local result = sut:map(mapFunc):toTable()
+      local result = sut:iter():map(mapFunc):toList()
 
       t.expect(table.is_equal(list, result))
    end)
@@ -306,7 +312,7 @@ t.describe("Linked list functional programming tests", function ()
       local expectedList = table.map(list, mapFunc)
       local sut = LinkedList(list)
 
-      local result = sut:map(mapFunc):toTable()
+      local result = sut:iter():map(mapFunc):toList()
 
       t.expect(table.is_equal(expectedList, result))
    end)

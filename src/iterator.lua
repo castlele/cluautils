@@ -5,7 +5,7 @@ local Iterator = {}
 Iterator.__index = Iterator
 
 
-local function wrap(gen, param, state)
+function Iterator.wrap(gen, param, state)
    return setmetatable({
       gen = gen,
       param = param,
@@ -75,7 +75,7 @@ end
 function Iterator.range(start, stop, step)
    local range = Range(start, stop, step or 1)
 
-   return wrap(rangeGen, range, start - (step or 1))
+   return Iterator.wrap(rangeGen, range, start - (step or 1))
 end
 
 ---@param t table
@@ -96,7 +96,7 @@ end
 ---@param t table
 ---@return Iterator
 function Iterator.table(t)
-   return wrap(tableGen, t, 0)
+   return Iterator.wrap(tableGen, t, 0)
 end
 
 
@@ -119,7 +119,7 @@ function Iterator:map(callback)
       gen = self.gen,
    }
 
-   return wrap(mapGen, param, self.state)
+   return Iterator.wrap(mapGen, param, self.state)
 end
 
 ---@param callback fun(item: any): boolean
@@ -131,7 +131,7 @@ function Iterator:filter(callback)
       param = self.param,
       gen = self.gen,
    }
-   return wrap(filterGen, param, self.state)
+   return Iterator.wrap(filterGen, param, self.state)
 end
 
 ---@param callback fun(item: any)
