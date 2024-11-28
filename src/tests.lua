@@ -17,7 +17,7 @@ local currentResults = {}
 ---@param str string
 ---@return string
 local function colorString(color, str)
-  return string.format(
+   return string.format(
       "%s[%sm%s%s[%sm",
       string.char(27),
       color,
@@ -45,7 +45,7 @@ tests.describe = function(label, func)
          return
       end
    end
-      print(colorString(colorTable.YELLOW, "Test cases succeeded: " .. wrapWith(label, "'")))
+   print(colorString(colorTable.YELLOW, "Test cases succeeded: " .. wrapWith(label, "'")))
 end
 
 tests.it = function(name, func)
@@ -67,6 +67,45 @@ end
 tests.expect = function(condition, message)
    if not condition then
       error(message)
+   end
+end
+
+tests.expectTableEqual = function (expected, actual)
+   if type(expected) ~= "table" then
+      error("Expected argument is not a table. It's type is " .. wrapWith(type(expected), "'"))
+   end
+
+   if type(actual) ~= "table" then
+      error("Actual argument is not a table. It's type is " .. wrapWith(type(actual), "'"))
+   end
+
+   if #expected ~= #actual then
+      local wrappedLenExpected = wrapWith(tostring(#expected), "'")
+      local wrappedLenActual = wrapWith(tostring(#actual), "'")
+
+      error(
+         "Lenght of the lists isn't equal to each other. Expected: "
+         .. wrappedLenExpected
+         .. "; Got: "
+         .. wrappedLenActual
+      )
+   end
+
+   for key, value in pairs(expected) do
+      if actual[key] ~= value then
+         local wrappedKey = wrapWith(key, "'")
+         local wrappedExpected = wrapWith(value, "'")
+         local wrappedActual = wrapWith(actual[key], "'")
+
+         error(
+            "Wrong value for key: "
+            .. wrappedKey
+            .. ". Expected: "
+            .. wrappedExpected
+            .. "; Got: "
+            .. wrappedActual
+         )
+      end
    end
 end
 
