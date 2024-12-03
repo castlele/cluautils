@@ -1,7 +1,8 @@
 ---@class BinaryTreeNode<T>
 ---@field value T
----@field left BinaryTreeNode<T>
----@field right BinaryTreeNode<T>
+---@field parent BinaryTreeNode<T>?
+---@field left BinaryTreeNode<T>?
+---@field right BinaryTreeNode<T>?
 local TreeNode = {}
 
 

@@ -44,6 +44,35 @@ function BST:insert(value)
    self.lenght = self.lenght + 1
 end
 
+---@return fun(): T?
+function BST:traverseInOrder()
+   -- ---@type BinaryTreeNode
+   -- local currentNode = self.root
+   -- local currentState = "l"
+   --
+   -- while currentNode and currentNode.left do
+   --    currentNode = currentNode.left
+   -- end
+   --
+   -- return function ()
+   --    if not currentNode then
+   --       return nil
+   --    end
+   --
+   --    local copy = currentNode
+   --
+   --    if currentState == "l" and currentNode.right then
+   --       currentNode = currentNode.right
+   --       currentState = "r"
+   --    else
+   --       currentNode = currentNode.parent
+   --       currentState = "l"
+   --    end
+   --
+   --    return copy
+   -- end
+end
+
 
 ---@private
 ---@param prevNode BinaryTreeNode<T>
@@ -51,10 +80,14 @@ end
 ---@param value T
 function BST:insertRecursively(prevNode, currentNode, value)
    if not currentNode then
+      local newNode = TreeNode(value)
+
+      newNode.parent = prevNode
+
       if prevNode.value <= value then
-         prevNode.left = TreeNode(value)
+         prevNode.left = newNode
       elseif prevNode.value > value then
-         prevNode.right = TreeNode(value)
+         prevNode.right = newNode
       end
 
       return
