@@ -1,18 +1,35 @@
 CC=clang
 CFLAGS=-shared -fPIC -arch arm64
 
+BIN=bin
+INCLUDE=-I./$(INTERNAL)/
+
+INTERNAL=internal
+INTERNAL_SRC=$(INTERNAL)/cthread.c
+INTERNAL_BIN=libcthread.so
+
 CFILES=thread.c
-BIN=thread.so
+BINARY=thread.so
+
+TEST_LIBS=-L./bin/ -lcthread
+TEST_SRC=tests/cthread_tests.c
+TEST_BINARY=tests
 
 LIBS=-llua -ldl -lm -I/Users/castlelecs/.luaver/lua/5.1/include/ -L/Users/castlelecs/.luaver/lua/5.1/lib/
 
-run:
-	love .
+test: compile_lib
+	clear
+	$(CC) $(INCLUDE) $(TEST_LIBS) $(TEST_SRC) -o $(BIN)/$(TEST_BINARY)
+	./$(BIN)/$(TEST_BINARY)
+
+compile_lib:
+	clear
+	$(CC) $(CFLAGS) $(INTERNAL_SRC) $(INCLUDE) -o $(BIN)/$(INTERNAL_BIN)
 
 build:
 	clear
-	$(CC) $(CFLAGS) $(LIBS) $(CFILES) -o $(BIN)
+	$(CC) $(CFLAGS) $(LIBS) $(CFILES) -o $(BINARY)
 
 clean:
 	clear
-	rm $(BIN)
+	rm -rf $(BIN)/*
