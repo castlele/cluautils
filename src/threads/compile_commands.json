@@ -6,13 +6,26 @@
       "-fPIC",
       "-arch",
       "arm64",
-      "-I/Users/castlelecs/.luaver/lua/5.1/include/",
+      "-I./internal/",
       "-o",
-      "thread.so",
-      "thread.c"
+      "bin/libcthread.so",
+      "internal/cthread.c"
     ],
-    "directory": "/Users/castlelecs/dev/dotfiles/nvim/cluautils/src/threads",
-    "file": "/Users/castlelecs/dev/dotfiles/nvim/cluautils/src/threads/thread.c",
-    "output": "/Users/castlelecs/dev/dotfiles/nvim/cluautils/src/threads/thread.so"
+    "directory": "/Users/castlelecs/dev/projects/cluautils/src/threads",
+    "file": "/Users/castlelecs/dev/projects/cluautils/src/threads/internal/cthread.c",
+    "output": "/Users/castlelecs/dev/projects/cluautils/src/threads/bin/libcthread.so"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang",
+      "-c",
+      "-I./internal/",
+      "-o",
+      "bin/tests",
+      "tests/cthread_tests.c"
+    ],
+    "directory": "/Users/castlelecs/dev/projects/cluautils/src/threads",
+    "file": "/Users/castlelecs/dev/projects/cluautils/src/threads/tests/cthread_tests.c",
+    "output": "/Users/castlelecs/dev/projects/cluautils/src/threads/bin/tests"
   }
 ]
