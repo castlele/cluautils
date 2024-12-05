@@ -1,3 +1,5 @@
+require("src.table_utils.table_utils")
+
 local t = require("src.tests")
 local BST = require("src.datastructures.bst")
 
@@ -27,15 +29,16 @@ t.describe("BST creation and basic operations", function ()
    t.it("BST can be traversed inorder", function ()
       local list = { 4, 5, 2, 6, 1, 3 }
       local compFun = function (lhs, rhs)
-         return lhs < rhs
+         return lhs > rhs
       end
       local sut = BST(list)
       local inOrderedList = {}
+
 
       for value in sut:traverseInOrder() do
          table.insert(inOrderedList, value)
       end
 
-      t.expectTableEqual(table.sort(list, compFun), inOrderedList)
+      t.expectTableEqual(table.min_sort(list, compFun), inOrderedList)
    end)
 end)

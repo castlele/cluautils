@@ -11,6 +11,7 @@ local BST = {}
 function BST:new(default)
    ---@type BinarySearchTree
    local this = {
+      root = nil,
       lenght = 0,
    }
 
@@ -39,44 +40,70 @@ end
 function BST:insert(value)
    if self.root == nil then
       self.root = TreeNode(value)
+   else
+
+      if self.root.value < value then
+         self:insertRecursively(self.root, self.root.right, value)
+      else
+         self:insertRecursively(self.root, self.root.left, value)
+      end
    end
 
    self.lenght = self.lenght + 1
 end
 
+---@private
+---@param node BinaryTreeNode?
+function BST:getNextInOrder(node)
+   local currentNode = node
+
+   if currentNode then
+      if currentNode.left then
+         self:getNextInOrder(currentNode.left)
+      end
+
+      coroutine.yield(currentNode)
+
+      if currentNode.right then
+         self:getNextInOrder(currentNode.right)
+      end
+   else
+      coroutine.yield(nil)
+   end
+
+end
+
 ---@return fun(): T?
 function BST:traverseInOrder()
    -- ---@type BinaryTreeNode
-   -- local currentNode = self.root
+   local currentNode = self.root
    -- local currentState = "l"
    --
    -- while currentNode and currentNode.left do
    --    currentNode = currentNode.left
    -- end
    --
-   -- return function ()
-   --    if not currentNode then
-   --       return nil
-   --    end
-   --
-   --    local copy = currentNode
-   --
-   --    if currentState == "l" and currentNode.right then
-   --       currentNode = currentNode.right
-   --       currentState = "r"
-   --    else
-   --       currentNode = currentNode.parent
-   --       currentState = "l"
-   --    end
-   --
-   --    return copy
-   -- end
+   local thread = coroutine.create(self.getNextInOrder)
+
+   return function ()
+
+
+      local _, node = coroutine.resume(thread, self, currentNode)
+
+      currentNode = node
+
+      if node then
+         return node.value
+      end
+
+      return nil
+   end
 end
 
 
 ---@private
----@param prevNode BinaryTreeNode<T>
----@param currentNode BinaryTreeNode<T>
+---@param prevNode BinaryTreeNode[T]
+---@param currentNode BinaryTreeNode[T]
 ---@param value T
 function BST:insertRecursively(prevNode, currentNode, value)
    if not currentNode then
@@ -85,18 +112,18 @@ function BST:insertRecursively(prevNode, currentNode, value)
       newNode.parent = prevNode
 
       if prevNode.value <= value then
-         prevNode.left = newNode
-      elseif prevNode.value > value then
          prevNode.right = newNode
+      elseif prevNode.value > value then
+         prevNode.left = newNode
       end
 
       return
    end
 
    if currentNode.value <= value then
-      self:insertRecursively(currentNode, currentNode.left, value)
-   elseif currentNode.value > value then
       self:insertRecursively(currentNode, currentNode.right, value)
+   elseif currentNode.value > value then
+      self:insertRecursively(currentNode, currentNode.left, value)
    end
 end
 

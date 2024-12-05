@@ -129,3 +129,25 @@ function table.alloc(size, defaultValue)
 
    return t
 end
+
+---@param t table
+---@param comparator (fun(lhs: T, rhs: T): boolean)?
+---@return table
+function table.min_sort(t, comparator)
+   local comp = comparator or function (lhs, rhs) return lhs > rhs end
+   local res = t
+
+   for i = 1, #res, 1 do
+      local min = i
+
+      for j = i + 1, #res, 1 do
+         if comp(res[min], res[j]) then
+            min = j
+         end
+      end
+
+      res[min], res[i] = res[i], res[min]
+   end
+
+   return res
+end

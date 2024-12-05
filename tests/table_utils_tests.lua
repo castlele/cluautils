@@ -234,5 +234,13 @@ function TableUtilsTestCase:test_allocation_with_default_value()
    return #testable_table == size
 end
 
+function TableUtilsTestCase:test_min_sort()
+   local expected = { 1, 2, 3, 4, 5, 6 }
+   local original = { 4, 5, 2, 6, 1, 3 }
+
+   local result = table.min_sort(original)
+
+   return table.is_equal(result, expected)
+end
 
 TableUtilsTestCase:run_tests()
