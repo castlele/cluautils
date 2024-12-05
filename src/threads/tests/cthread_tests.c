@@ -2,17 +2,20 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <unistd.h>
 
 #pragma mark - Utils
 
 typedef struct TestResult {
     bool status;
+    char *name;
     char *message;
 } TestResult;
 
 #define expectWithMessage(condition, m) \
     TestResult r; \
     r.status = (condition); \
+    r.name = strdup(__func__); \
     r.message = (m); \
     return r;
 
@@ -23,9 +26,9 @@ void test(TestResult (*func)())
     TestResult res = func();
 
     if (res.status) {
-        printf("Test '%s' passed successfuly!\n", __func__);
+        printf("Test '%s' passed successfuly!\n", res.name);
     } else {
-        printf("Test '%s' failed!\n", __func__);
+        printf("Test '%s' failed!\n", res.name);
 
         if (res.message) {
             printf("\t%s\n", res.message);
@@ -36,9 +39,11 @@ void test(TestResult (*func)())
 #pragma mark - Test Cases List
 
 TestResult threadCanBeCreatedAndWaitedByParentThread();
+TestResult mutextSynchronizesGlobalState();
 
 TestResult (*tests[])() = {
     threadCanBeCreatedAndWaitedByParentThread,
+    mutextSynchronizesGlobalState,
 };
 
 
@@ -61,10 +66,19 @@ typedef struct Argument {
     bool isUsed;
 } Argument;
 
+int globalState;
+
 void testFunction(void *args)
 {
     Argument *arg = (Argument *)args;
     arg->isUsed = true;
+}
+
+void addMillionGlobalState()
+{
+    for (int i = 0; i < 1000000; i++) {
+        globalState++;
+    }
 }
 
 TestResult threadCanBeCreatedAndWaitedByParentThread()
@@ -76,4 +90,29 @@ TestResult threadCanBeCreatedAndWaitedByParentThread()
     waitThread(&sut);
 
     expect(result == CThreadStatusOk && arg.isUsed);
+}
+
+TestResult mutextSynchronizesGlobalState()
+{
+    globalState = 0;
+    int threadsCount = 4;
+    int expectedResult = threadsCount*1000000;
+    char errorMessage[300];
+    CThread sut[] = {
+        createThread(addMillionGlobalState, NULL),
+        createThread(addMillionGlobalState, NULL),
+        createThread(addMillionGlobalState, NULL),
+        createThread(addMillionGlobalState, NULL),
+    };
+
+    for (int i = 0; i < threadsCount; i++) {
+        startThread(&sut[i]);
+    }
+
+    for (int i = 0; i < threadsCount; i++) {
+        waitThread(&sut[i]);
+    }
+
+    sprintf(errorMessage, "Wrong sum. Expected %i, got: %i", expectedResult, globalState);
+    expectWithMessage(globalState == expectedResult, errorMessage);
 }
