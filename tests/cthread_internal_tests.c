@@ -1,4 +1,5 @@
 #include <cthread.h>
+#include <clock.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
@@ -74,10 +75,14 @@ void testFunction(void *args)
     arg->isUsed = true;
 }
 
-void addMillionGlobalState()
+void addMillionGlobalState(void *args)
 {
+    CLock *lock = (CLock *)args;
+
     for (int i = 0; i < 1000000; i++) {
+        mutexLock(lock);
         globalState++;
+        mutexUnlock(lock);
     }
 }
 
@@ -98,11 +103,12 @@ TestResult mutextSynchronizesGlobalState()
     int threadsCount = 4;
     int expectedResult = threadsCount*1000000;
     char errorMessage[300];
+    CLock lock = createLock();
     CThread sut[] = {
-        createThread(addMillionGlobalState, NULL),
-        createThread(addMillionGlobalState, NULL),
-        createThread(addMillionGlobalState, NULL),
-        createThread(addMillionGlobalState, NULL),
+        createThread(addMillionGlobalState, (void *)&lock),
+        createThread(addMillionGlobalState, (void *)&lock),
+        createThread(addMillionGlobalState, (void *)&lock),
+        createThread(addMillionGlobalState, (void *)&lock),
     };
 
     for (int i = 0; i < threadsCount; i++) {
