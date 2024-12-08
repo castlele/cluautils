@@ -16,7 +16,7 @@ TEST_LIBS=-L./$(BIN)/ -lcthread
 TEST_SRC=tests/cthread_internal_tests.c
 TEST_BINARY=tests
 
-LIBS=-llua -ldl -lm -I/Users/castlelecs/.luaver/lua/5.1/include/ -L/Users/castlelecs/.luaver/lua/5.1/lib/
+LIBS=-llua -ldl -lm -I/Users/castlelecs/.luaver/lua/5.1/include/ -L/Users/castlelecs/.luaver/lua/5.1/lib/ $(TEST_LIBS)
 
 test: compile_lib
 	clear
