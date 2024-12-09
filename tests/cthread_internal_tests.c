@@ -91,7 +91,7 @@ TestResult threadCanBeCreatedAndWaitedByParentThread()
     Argument arg = { .isUsed = false };
     CThread sut = createThread(testFunction, (void *)&arg);
 
-    CThreadStatus result =startThread(&sut);
+    CThreadStatus result = startThread(&sut);
     waitThread(&sut);
 
     expect(result == CThreadStatusOk && arg.isUsed);

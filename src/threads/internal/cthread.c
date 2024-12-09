@@ -1,3 +1,4 @@
+#include <limits.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <pthread.h>
@@ -24,6 +25,12 @@ CThread createThreadWithParams(CThreadParams params, Callback callback, void *ar
     };
     CThread t;
 
+    char id[100];
+    sprintf(id, "%i", rand());
+
+    printf(id);
+
+    t.id = id;
     t.params = params;
     t.private = malloc(sizeof(_CThread));
     *(_CThread *)(t.private) = private;

@@ -13,6 +13,7 @@ static CThreadParams DEFAULT_PARAMS = {
 };
 
 typedef struct CThread {
+    const char *id;
     CThreadParams params;
     pthread_t wrappedThread;
     void *private;

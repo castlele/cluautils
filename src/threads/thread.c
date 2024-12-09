@@ -176,26 +176,27 @@ typedef struct LuaThreadState {
 void runCode(void *args)
 {
     printf("Running code\n");
-    LuaThreadState *state = (LuaThreadState *)args;
+    LuaThreadState state = { .L = luaL_newstate(), .code = "print(\"hello world\")", };
+    // LuaThreadState *state = (LuaThreadState *)args;
 
-    if (state == NULL) {
-        // TODO: Throw error!
-        return;
-    }
+    // if (state == NULL) {
+    //     // TODO: Throw error!
+    //     return;
+    // }
 
-    luaL_openlibs(state->L);
+    luaL_openlibs(state.L);
 
-    if (access(state->code, F_OK) == 0) {
+    if (access(state.code, F_OK) == 0) {
         // TODO: Refactor errors
-        if (luaL_dofile(state->L, state->code)) {
-            printf("Can not run file: %s\n", lua_tostring(state->L, -1));
+        if (luaL_dofile(state.L, state.code)) {
+            printf("Can not run file: %s\n", lua_tostring(state.L, -1));
         } else {
             printf("File done\n");
         }
     } else {
-        if (luaL_loadstring(state->L, state->code) || lua_pcall(state->L, 0, 0, 0)) {
+        if (luaL_loadstring(state.L, state.code) || lua_pcall(state.L, 0, 0, 0)) {
             // TODO: Refactor errors
-            printf("Can not run code: %s\n", lua_tostring(state->L, -1));
+            printf("Can not run code: %s\n", lua_tostring(state.L, -1));
         } else {
             printf("Code done\n");
         }
@@ -221,20 +222,23 @@ static int createLuaThread(lua_State *L)
 {
     const char *code = luaL_checkstring(L, 1);
     LuaThreadState threadState = { .L = luaL_newstate(), .code = code, };
-    CThread threadData = createThread(runCode, (void *)&threadState);
+    CThread threadData = createThread(runCode, NULL);//, (void *)&threadState);
 
-    lua_createtable(L, 0, 2);
+    printf("created: %s\n", threadData.id);
 
-    lua_pushstring(L, "threadData");
+    // lua_createtable(L, 0, 2);
+
+    // lua_pushstring(L, "threadData");
     lua_pushlightuserdata(L, (void *)&threadData);
-    lua_settable(L, -3);
+    // lua_settable(L, -3);
 
     return 1;
 }
 
 static int startLuaThread(lua_State *L)
 {
-    CThread *threadData = getThreadState(L);
+    // CThread *threadData = getThreadState(L);
+    CThread *threadData = lua_touserdata(L, 1);
     CThreadStatus status = startThread(threadData);
 
     switch (status) {
@@ -254,7 +258,8 @@ static int startLuaThread(lua_State *L)
 
 static int waitLuaThread(lua_State *L)
 {
-    CThread *threadData = getThreadState(L);
+    // CThread *threadData = getThreadState(L);
+    CThread *threadData = lua_touserdata(L, 1);
     waitThread(threadData);
     return 0;
 }
