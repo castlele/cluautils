@@ -89,10 +89,10 @@ void addMillionGlobalState(void *args)
 TestResult threadCanBeCreatedAndWaitedByParentThread()
 {
     Argument arg = { .isUsed = false };
-    CThread sut = createThread(testFunction, (void *)&arg);
+    CThread *sut = createThread(testFunction, (void *)&arg);
 
-    CThreadStatus result = startThread(&sut);
-    waitThread(&sut);
+    CThreadStatus result = startThread(sut);
+    waitThread(sut);
 
     expect(result == CThreadStatusOk && arg.isUsed);
 }
@@ -104,7 +104,7 @@ TestResult mutextSynchronizesGlobalState()
     int expectedResult = threadsCount*1000000;
     char errorMessage[300];
     CLock lock = createLock();
-    CThread sut[] = {
+    CThread *sut[] = {
         createThread(addMillionGlobalState, (void *)&lock),
         createThread(addMillionGlobalState, (void *)&lock),
         createThread(addMillionGlobalState, (void *)&lock),
@@ -112,11 +112,11 @@ TestResult mutextSynchronizesGlobalState()
     };
 
     for (int i = 0; i < threadsCount; i++) {
-        startThread(&sut[i]);
+        startThread(sut[i]);
     }
 
     for (int i = 0; i < threadsCount; i++) {
-        waitThread(&sut[i]);
+        waitThread(sut[i]);
     }
 
     sprintf(errorMessage, "Wrong sum. Expected %i, got: %i", expectedResult, globalState);

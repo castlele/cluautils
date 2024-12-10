@@ -13,7 +13,7 @@ static CThreadParams DEFAULT_PARAMS = {
 };
 
 typedef struct CThread {
-    const char *id;
+    char *id;
     CThreadParams params;
     pthread_t wrappedThread;
     void *private;
@@ -27,8 +27,8 @@ typedef enum CThreadStatus {
     CThreadStatusError,
 } CThreadStatus;
 
-CThread createThreadWithParams(CThreadParams params, Callback callback, void *args);
-CThread createThread(Callback callback, void *args);
+CThread *createThreadWithParams(CThreadParams params, Callback callback, void *args);
+CThread *createThread(Callback callback, void *args);
 CThreadStatus startThread(CThread *thread);
 void waitThread(CThread *thread);
 

@@ -3,6 +3,7 @@
 #include <lauxlib.h>
 #include <unistd.h>
 #include <cthread.h>
+#include <stdlib.h>
 
 // typedef enum ThreadType {
 //     ThreadTypeDetached = 0,
@@ -175,28 +176,26 @@ typedef struct LuaThreadState {
 
 void runCode(void *args)
 {
-    printf("Running code\n");
-    LuaThreadState state = { .L = luaL_newstate(), .code = "print(\"hello world\")", };
-    // LuaThreadState *state = (LuaThreadState *)args;
+    LuaThreadState *state = (LuaThreadState *)args;
 
-    // if (state == NULL) {
-    //     // TODO: Throw error!
-    //     return;
-    // }
+    if (state == NULL) {
+        // TODO: Throw error!
+        return;
+    }
 
-    luaL_openlibs(state.L);
+    luaL_openlibs(state->L);
 
-    if (access(state.code, F_OK) == 0) {
-        // TODO: Refactor errors
-        if (luaL_dofile(state.L, state.code)) {
-            printf("Can not run file: %s\n", lua_tostring(state.L, -1));
+    if (access(state->code, F_OK) == 0) {
+        // TODO: Refactor messages
+        if (luaL_dofile(state->L, state->code)) {
+            printf("Can not run file: %s\n", lua_tostring(state->L, -1));
         } else {
             printf("File done\n");
         }
     } else {
-        if (luaL_loadstring(state.L, state.code) || lua_pcall(state.L, 0, 0, 0)) {
-            // TODO: Refactor errors
-            printf("Can not run code: %s\n", lua_tostring(state.L, -1));
+        // TODO: Refactor messages
+        if (luaL_loadstring(state->L, state->code) || lua_pcall(state->L, 0, 0, 0)) {
+            printf("Can not run code: %s\n", lua_tostring(state->L, -1));
         } else {
             printf("Code done\n");
         }
@@ -221,26 +220,28 @@ CThread *getThreadState(lua_State *L)
 static int createLuaThread(lua_State *L)
 {
     const char *code = luaL_checkstring(L, 1);
-    LuaThreadState threadState = { .L = luaL_newstate(), .code = code, };
-    CThread threadData = createThread(runCode, NULL);//, (void *)&threadState);
+    LuaThreadState *threadState = malloc(sizeof(LuaThreadState));
+    threadState->L = luaL_newstate();
+    threadState->code = code;
 
-    printf("created: %s\n", threadData.id);
+    CThread *threadData = createThread(runCode, threadState);
 
-    // lua_createtable(L, 0, 2);
+    lua_createtable(L, 0, 1);
 
-    // lua_pushstring(L, "threadData");
-    lua_pushlightuserdata(L, (void *)&threadData);
-    // lua_settable(L, -3);
+    // TODO: Constants
+    lua_pushstring(L, "threadData");
+    lua_pushlightuserdata(L, threadData);
+    lua_settable(L, -3);
 
     return 1;
 }
 
 static int startLuaThread(lua_State *L)
 {
-    // CThread *threadData = getThreadState(L);
-    CThread *threadData = lua_touserdata(L, 1);
+    CThread *threadData = getThreadState(L);
     CThreadStatus status = startThread(threadData);
 
+    // TODO: Update handling or remove
     switch (status) {
         case CThreadStatusOk:
             printf("OK\n");
@@ -258,8 +259,7 @@ static int startLuaThread(lua_State *L)
 
 static int waitLuaThread(lua_State *L)
 {
-    // CThread *threadData = getThreadState(L);
-    CThread *threadData = lua_touserdata(L, 1);
+    CThread *threadData = getThreadState(L);
     waitThread(threadData);
     return 0;
 }

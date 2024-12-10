@@ -17,28 +17,24 @@ pthread_attr_t getAttributes(CThreadParams *params);
 
 #pragma mark - Public Definitions
 
-CThread createThreadWithParams(CThreadParams params, Callback callback, void *args)
+CThread *createThreadWithParams(CThreadParams params, Callback callback, void *args)
 {
     _CThread private = {
         .args = args,
         .callback = callback,
     };
-    CThread t;
+    CThread *t = malloc(sizeof(CThread));
 
-    char id[100];
-    sprintf(id, "%i", rand());
-
-    printf(id);
-
-    t.id = id;
-    t.params = params;
-    t.private = malloc(sizeof(_CThread));
-    *(_CThread *)(t.private) = private;
+    // TODO: How to pass id to thread?
+    t->id = "hello";
+    t->params = params;
+    t->private = malloc(sizeof(_CThread));
+    *(_CThread *)(t->private) = private;
 
     return t;
 }
 
-CThread createThread(Callback callback, void *args)
+CThread *createThread(Callback callback, void *args)
 {
     return createThreadWithParams(DEFAULT_PARAMS, callback, args);
 }

@@ -1,13 +1,14 @@
-require("src.string_utils.string_utils")
+require("src.file_manager.file_manager")
 local t = require("src.tests")
 local thread = assert(package.loadlib("./src/threads/bin/thread.so", "_luaopen_thread"))()
 
 t.describe("Thread Module Tests", function ()
    local function assertOutput()
-      local f = assert(io.open("logs.log", "r"))
-      local lines = string.split(f:read("*a"), "\n")
+      local fileName = "logs.log"
+      local file = assert(io.open(fileName, "r"))
+      local lines = FM.get_lines_from_file(file, nil)
 
-      f:close()
+      FM.delete_file(fileName)
 
       t.expect(#lines == 22, "Got wrong amount of lines. Expected: " .. 22 .. "; got: " .. #lines)
    end
@@ -15,9 +16,9 @@ t.describe("Thread Module Tests", function ()
    t.it("Joinable threads can be created", function ()
       local code = [[
 local f = assert(io.open("logs.log", "w"))
+local i = 1
 
 while true do
-   print(i)
    f:write("Index: " .. i .. "\n")
 
    i = i + 1
