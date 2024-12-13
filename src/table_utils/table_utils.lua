@@ -129,3 +129,20 @@ function table.alloc(size, defaultValue)
 
    return t
 end
+
+function table:flatten()
+   local result = {}
+
+   for _, value in ipairs(self) do
+      if type(value) == "table" then
+         table.concat_tables(
+            result,
+            table.flatten(value)
+         )
+      else
+         table.insert(result, value)
+      end
+   end
+
+   return result
+end

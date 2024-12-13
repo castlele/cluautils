@@ -1,5 +1,6 @@
 require("src.tests.base_test_case")
 require("src.table_utils.table_utils")
+local t = require("src.tests")
 
 TableUtilsTestCase = CTestCase
 
@@ -236,3 +237,44 @@ end
 
 
 TableUtilsTestCase:run_tests()
+
+
+t.describe("table utils tests", function ()
+   t.it("flatten returns empty list if both arguments are empty", function ()
+      local result = table.flatten({})
+
+      t.expect(table.is_empty(result), "Expected len is 0, but got: " .. #result)
+   end)
+
+   t.it("flatten creates one empty table from multiple empty tables", function ()
+      local result = table.flatten({{}, {}, {}})
+
+      t.expect(table.is_empty(result), "Expected len is 0, but got: " .. #result)
+   end)
+
+   t.it("flatten creates one empty table from multiple empty nested tables", function ()
+      local result = table.flatten({{{}, {}}, {{}, {}, {}}, {}})
+
+      t.expect(table.is_empty(result), "Expected len is 0, but got: " .. #result)
+   end)
+
+   t.it("flatten returns the same table if it do't have nested tables", function ()
+      local list = {1, 2, 3, 4, 5}
+      local result = table.flatten(list)
+
+      t.expectTableEqual(list, result)
+   end)
+
+   t.it("flatten return one list of all nested lists", function ()
+      local list = {{1, 2}, {3, 4, 5}, {6}}
+      local expectedList = {1, 2, 3, 4, 5, 6}
+
+      local result = table.flatten(list)
+
+      for _, value in ipairs(result) do
+         print(value)
+      end
+
+      t.expectTableEqual(expectedList, result)
+   end)
+end)
