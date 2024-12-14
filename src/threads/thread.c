@@ -38,12 +38,14 @@ void runCode(void *args)
             printf("Code done\n");
         }
     }
+
+    lua_close(state->L);
 }
 
-CThread *getThreadState(lua_State *L)
+CThread *getThreadState(lua_State *L, int index)
 {
-    lua_getfield(L, 1, "threadData");
-    CThread *threadData = (CThread *)lua_touserdata(L, 2);
+    lua_getfield(L, index, "threadData");
+    CThread *threadData = (CThread *)lua_touserdata(L, index + 1);
 
     if (threadData == NULL) {
         // TODO: Add proper exception handling
@@ -76,15 +78,24 @@ static int createLuaThread(lua_State *L)
 
 static int startLuaThread(lua_State *L)
 {
-    CThread *threadData = getThreadState(L);
-    CThreadStatus status = startThread(threadData);
+    int nargs = lua_gettop(L);
+    printf("IS FIRST ARG IS TABLE: %i\n", lua_istable(L, 0-nargs));
+    printf("IS SECOND ARGUMENT A NUMBER: %i\n", lua_isnumber(L, 1-nargs));
 
-    // TODO: Implement arguments passing
-    // if (luaL_loadstring(L, "return require(\"cluautils.datastructures.linkedlist\")()") || lua_pcall(L, 0, 1, 0)) {
-    //     printf("Can not get linked list lib: %s\n", lua_tostring(L, -1));
-    // } else {
-    //     
-    // }
+    int args[nargs - 1];
+
+    for (int i = 1; i < nargs; i++) {
+        int stackIndex = i - nargs;
+
+        // TODO: Allow to pass something other than numbers
+        if (lua_isnumber(L, stackIndex)) {
+            args[i - 1] = lua_tonumber(L, stackIndex);
+            printf("Index %i is a number %i\n", stackIndex, args[i - 1]);
+        }
+    }
+
+    CThread *threadData = getThreadState(L, 0 - nargs);
+    CThreadStatus status = startThread(threadData);
 
     // TODO: Update handling or remove
     switch (status) {
@@ -104,7 +115,7 @@ static int startLuaThread(lua_State *L)
 
 static int waitLuaThread(lua_State *L)
 {
-    CThread *threadData = getThreadState(L);
+    CThread *threadData = getThreadState(L, 1);
     waitThread(threadData);
     return 0;
 }

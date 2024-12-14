@@ -50,13 +50,13 @@ f:close()
       assertOutput()
    end)
 
-   -- t.it("Arguments can be passed to thread's code", function ()
-   --    local code = "./tests/res/pthread_counter_with_param.lua"
-   --    local sut = thread.create(code)
-   --
-   --    thread.start(sut, 10)
-   --    thread.wait(sut)
-   --
-   --    assertOutput(10)
-   -- end)
+   t.it("Arguments can be passed to thread's code", function ()
+      local code = "./tests/res/pthread_counter_with_param.lua"
+      local sut = thread.create(code)
+
+      thread.start(sut, 10)
+      thread.wait(sut)
+
+      assertOutput(10)
+   end)
 end)
