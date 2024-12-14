@@ -1,36 +1,50 @@
 CC=clang
-CFLAGS=-shared -fPIC -arch arm64
+CFLAGS=-arch arm64
+ARCHIVE_CFLAGS=-shared -fPIC $(CFLAGS)
 
-SRC=src/threads
-BIN=$(SRC)/bin
-INTERNAL=$(SRC)/internal
-INTERNAL_SRC=$(INTERNAL)/cthread.c $(INTERNAL)/clock.c
-INTERNAL_BIN=libcthread.so
+SRC_FOLDER=src
+THREAD_SRC=$(SRC_FOLDER)/threads
+THREAD_BIN=$(THREAD_SRC)/bin
+THREAD_INTERNAL=$(THREAD_SRC)/internal
+THREAD_INTERNAL_SRC=$(THREAD_INTERNAL)/cthread.c $(THREAD_INTERNAL)/clock.c
+THREAD_INTERNAL_BIN=libcthread.so
+MEMORY_SRC=$(SRC_FOLDER)/memory
+MEMORY_BIN=$(MEMORY_SRC)/bin
 
-INCLUDE=-I./$(INTERNAL)/
+THREAD_INCLUDE=-I./$(THREAD_INTERNAL)/
 
-CFILES=$(SRC)/thread.c
-BINARY=thread.so
+THREAD_CFILES=$(THREAD_SRC)/thread.c
+THREAD_BINARY=thread.so
+MEMORY_CFILES=$(MEMORY_SRC)/cmemory.c
+MEMORY_BINARY=cmemory.so
 
-TEST_LIBS=-L./$(BIN)/ -lcthread
+
+THREAD_LIBS=-L./$(THREAD_BIN)/ -lcthread
 TEST_SRC=tests/cthread_internal_tests.c
 TEST_BINARY=tests
 
-LIBS=-llua -ldl -lm -I/Users/castlelecs/.luaver/lua/5.1/include/ -L/Users/castlelecs/.luaver/lua/5.1/lib/ $(TEST_LIBS)
+LIBS=-llua -ldl -lm -I/Users/castlelecs/.luaver/lua/5.1/include/ -L/Users/castlelecs/.luaver/lua/5.1/lib/
+
+build: build_thread build_memory
 
 test: compile_lib
 	clear
-	$(CC) $(INCLUDE) $(TEST_LIBS) $(TEST_SRC) -o $(BIN)/$(TEST_BINARY)
-	./$(BIN)/$(TEST_BINARY)
+	$(CC) $(THREAD_INCLUDE) $(THREAD_LIBS) $(TEST_SRC) -o $(THREAD_BIN)/$(TEST_BINARY)
+	./$(THREAD_BIN)/$(TEST_BINARY)
 
-build: compile_lib
+build_memory:
 	clear
-	$(CC) $(CFLAGS) $(LIBS) $(INCLUDE) $(CFILES) -o $(BIN)/$(BINARY)
+	$(CC) $(ARCHIVE_CFLAGS) $(LIBS) $(MEMORY_CFILES) -o $(MEMORY_BIN)/$(MEMORY_BINARY)
 
-compile_lib:
+build_thread: compile_thread
 	clear
-	$(CC) $(CFLAGS) $(INTERNAL_SRC) $(INCLUDE) -o $(BIN)/$(INTERNAL_BIN)
+	$(CC) $(ARCHIVE_CFLAGS) $(LIBS) $(THREAD_LIBS) $(THREAD_INCLUDE) $(THREAD_CFILES) -o $(THREAD_BIN)/$(THREAD_BINARY)
+
+compile_thread:
+	clear
+	$(CC) $(ARCHIVE_CFLAGS) $(THREAD_INTERNAL_SRC) $(THREAD_INCLUDE) -o $(THREAD_BIN)/$(THREAD_INTERNAL_BIN)
 
 clean:
 	clear
-	rm -rf $(BIN)/*
+	rm -rf $(THREAD_BIN)/*
+	rm -rf $(MEMORY_BIN)/*
