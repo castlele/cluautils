@@ -1,6 +1,6 @@
 require("src.file_manager.file_manager")
 local t = require("src.tests")
-local thread = assert(package.loadlib("./src/threads/bin/thread.so", "_luaopen_thread"))()
+local thread = assert(package.loadlib("./src/threads/bin/thread.so", "_luaopen_cluautils_thread"))()
 
 t.describe("Thread Module Tests", function ()
    ---@param maxValue integer?
