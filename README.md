@@ -21,3 +21,20 @@ cd cluautils
 
 luarocks make
 ```
+
+## Modules
+
+### OOP
+
+Goals of this module:
+
+- provide a basic functionality for inheritance
+- make it easier to compare different classes
+- encapsulate common functionality in a base class
+
+
+How to use:
+
+```lua
+-- TODO: TBD
+```
