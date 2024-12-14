@@ -77,31 +77,27 @@ static int createLuaThread(lua_State *L)
 static int startLuaThread(lua_State *L)
 {
     CThread *threadData = getThreadState(L);
-    // CThreadStatus status = startThread(threadData);
+    CThreadStatus status = startThread(threadData);
 
-    if (luaL_loadstring(L, "return require(\"cluautils.datastructures.linkedlist\")()") || lua_pcall(L, 0, 1, 0)) {
-        printf("Can not get linked list lib: %s\n", lua_tostring(L, -1));
-    } else {
-        
-    }
-// require("cluautils.datastructures.linkedlist")
-//     for (int i = 0; i < nargs; ++i) {
-//         int ud = lua_tointeger(L, i + 2);
-//         add(&args, ud);
-//     }
+    // TODO: Implement arguments passing
+    // if (luaL_loadstring(L, "return require(\"cluautils.datastructures.linkedlist\")()") || lua_pcall(L, 0, 1, 0)) {
+    //     printf("Can not get linked list lib: %s\n", lua_tostring(L, -1));
+    // } else {
+    //     
+    // }
 
     // TODO: Update handling or remove
-    // switch (status) {
-    //     case CThreadStatusOk:
-    //         printf("OK\n");
-    //         break;
-    //     case CThreadStatusErrorRestart:
-    //         printf("ERROR RESTART\n");
-    //         break;
-    //     case CThreadStatusError:
-    //         printf("ERROR\n");
-    //         break;
-    // }
+    switch (status) {
+        case CThreadStatusOk:
+            printf("OK\n");
+            break;
+        case CThreadStatusErrorRestart:
+            printf("ERROR RESTART\n");
+            break;
+        case CThreadStatusError:
+            printf("ERROR\n");
+            break;
+    }
 
     return 0;
 }
