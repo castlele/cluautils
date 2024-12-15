@@ -1,15 +1,19 @@
+#include "internal/queue.h"
+#include <cthread.h>
+#include <lauxlib.h>
 #include <lua.h>
 #include <lualib.h>
-#include <lauxlib.h>
-#include <unistd.h>
-#include <cthread.h>
+#include <queue.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #pragma mark - Private Definitions
 
 typedef struct LuaThreadState {
     lua_State *L;
     const char *code;
+    int nargs;
+    Queue args;
 } LuaThreadState;
 
 void runCode(void *args)
@@ -25,18 +29,26 @@ void runCode(void *args)
 
     if (access(state->code, F_OK) == 0) {
         // TODO: Refactor messages
-        if (luaL_dofile(state->L, state->code)) {
-            printf("Can not run file: %s\n", lua_tostring(state->L, -1));
-        } else {
-            printf("File done\n");
+        if (luaL_loadfile(state->L, state->code)) {
+            printf("Can not load file: %s\n", lua_tostring(state->L, -1));
         }
     } else {
         // TODO: Refactor messages
-        if (luaL_loadstring(state->L, state->code) || lua_pcall(state->L, 0, 0, 0)) {
-            printf("Can not run code: %s\n", lua_tostring(state->L, -1));
-        } else {
-            printf("Code done\n");
+        if (luaL_loadstring(state->L, state->code)) {
+            printf("Can not load code: %s\n", lua_tostring(state->L, -1));
         }
+    }
+
+    if (state->nargs > 0) {
+        for (int i = 0; i < state->nargs; i++) {
+            int *num = pop(&state->args);
+            lua_pushnumber(state->L, *num);
+        }
+    }
+
+    // TODO: Refactor messages
+    if (lua_pcall(state->L, state->nargs, 0, 0)) {
+        printf("Can not run code: %s\n", lua_tostring(state->L, -1));
     }
 
     lua_close(state->L);
@@ -63,6 +75,7 @@ static int createLuaThread(lua_State *L)
     LuaThreadState *threadState = malloc(sizeof(LuaThreadState));
     threadState->L = luaL_newstate();
     threadState->code = code;
+    threadState->nargs = 0;
 
     CThread *threadData = createThread(runCode, threadState);
 
@@ -79,22 +92,23 @@ static int createLuaThread(lua_State *L)
 static int startLuaThread(lua_State *L)
 {
     int nargs = lua_gettop(L);
-    printf("IS FIRST ARG IS TABLE: %i\n", lua_istable(L, 0-nargs));
-    printf("IS SECOND ARGUMENT A NUMBER: %i\n", lua_isnumber(L, 1-nargs));
-
-    int args[nargs - 1];
+    Queue *args = initQueue();
 
     for (int i = 1; i < nargs; i++) {
         int stackIndex = i - nargs;
 
         // TODO: Allow to pass something other than numbers
         if (lua_isnumber(L, stackIndex)) {
-            args[i - 1] = lua_tonumber(L, stackIndex);
-            printf("Index %i is a number %i\n", stackIndex, args[i - 1]);
+            int num = (int)lua_tonumber(L, stackIndex);
+            push(args, &num);
         }
     }
 
+
     CThread *threadData = getThreadState(L, 0 - nargs);
+    LuaThreadState *state = (LuaThreadState *)getArgs(*threadData);
+    state->args = *args;
+    state->nargs = nargs - 1;
     CThreadStatus status = startThread(threadData);
 
     // TODO: Update handling or remove

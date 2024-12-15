@@ -27,6 +27,9 @@ typedef enum CThreadStatus {
     CThreadStatusError,
 } CThreadStatus;
 
+void *getArgs(CThread thread);
+void setArgs(CThread *thread, void *args);
+
 CThread *createThreadWithParams(CThreadParams params, Callback callback, void *args);
 CThread *createThread(Callback callback, void *args);
 CThreadStatus startThread(CThread *thread);

@@ -6,7 +6,7 @@ SRC_FOLDER=src
 THREAD_SRC=$(SRC_FOLDER)/threads
 THREAD_BIN=$(THREAD_SRC)/bin
 THREAD_INTERNAL=$(THREAD_SRC)/internal
-THREAD_INTERNAL_SRC=$(THREAD_INTERNAL)/cthread.c $(THREAD_INTERNAL)/clock.c
+THREAD_INTERNAL_SRC=$(THREAD_INTERNAL)/cthread.c $(THREAD_INTERNAL)/clock.c $(THREAD_INTERNAL)/queue.c
 THREAD_INTERNAL_BIN=libcthread.so
 MEMORY_SRC=$(SRC_FOLDER)/memory
 MEMORY_BIN=$(MEMORY_SRC)/bin
@@ -27,7 +27,7 @@ LIBS=-llua -ldl -lm -I/Users/castlelecs/.luaver/lua/5.1/include/ -L/Users/castle
 
 build: build_thread build_memory
 
-test: compile_lib
+test_thread: compile_thread
 	clear
 	$(CC) $(THREAD_INCLUDE) $(THREAD_LIBS) $(TEST_SRC) -o $(THREAD_BIN)/$(TEST_BINARY)
 	./$(THREAD_BIN)/$(TEST_BINARY)

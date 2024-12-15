@@ -1,5 +1,6 @@
 #include <cthread.h>
 #include <clock.h>
+#include <queue.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
@@ -41,10 +42,26 @@ void test(TestResult (*func)())
 
 TestResult threadCanBeCreatedAndWaitedByParentThread();
 TestResult mutextSynchronizesGlobalState();
+TestResult argumentCanBeTakenFromThread();
+TestResult argumentCanBeChangedAfterCreationOfTheThread();
+TestResult queueIsEmptyMethodReturnsFalseIfEmpty();
+TestResult queuePeekReturnsNullIfEmpty();
+TestResult queuePushAddsElementToTheEnd();
+TestResult queuePopReturnsFirstElementAndRemovesIt();
+TestResult queuePopReturnsNullIfEmpty();
+TestResult queueMultipleValuesCanBePushed();
 
 TestResult (*tests[])() = {
     threadCanBeCreatedAndWaitedByParentThread,
     mutextSynchronizesGlobalState,
+    argumentCanBeTakenFromThread,
+    argumentCanBeChangedAfterCreationOfTheThread,
+    queueIsEmptyMethodReturnsFalseIfEmpty,
+    queuePeekReturnsNullIfEmpty,
+    queuePushAddsElementToTheEnd,
+    queuePopReturnsNullIfEmpty,
+    queuePopReturnsFirstElementAndRemovesIt,
+    queueMultipleValuesCanBePushed,
 };
 
 
@@ -64,6 +81,7 @@ int main()
 #pragma mark - Test Cases Implementation
 
 typedef struct Argument {
+    char *id;
     bool isUsed;
 } Argument;
 
@@ -88,7 +106,7 @@ void addMillionGlobalState(void *args)
 
 TestResult threadCanBeCreatedAndWaitedByParentThread()
 {
-    Argument arg = { .isUsed = false };
+    Argument arg = { .id = "", .isUsed = false };
     CThread *sut = createThread(testFunction, (void *)&arg);
 
     CThreadStatus result = startThread(sut);
@@ -121,4 +139,99 @@ TestResult mutextSynchronizesGlobalState()
 
     sprintf(errorMessage, "Wrong sum. Expected %i, got: %i", expectedResult, globalState);
     expectWithMessage(globalState == expectedResult, errorMessage);
+}
+
+TestResult argumentCanBeTakenFromThread()
+{
+    Argument args = { .id = "Javie", .isUsed = true };
+    CThread *sut = createThread(testFunction, &args);
+
+    Argument *result = (Argument *)getArgs(*sut);
+
+    expect(result->isUsed && strcmp(args.id, result->id) == 0);
+}
+
+TestResult argumentCanBeChangedAfterCreationOfTheThread()
+{
+    Argument args = { .id = "Javie", .isUsed = false };
+    Argument argToChange = { .id = "New Arg", .isUsed = true };
+    CThread *sut = createThread(testFunction, &args);
+
+    setArgs(sut, &argToChange);
+    Argument *result = (Argument *)getArgs(*sut);
+
+    expect(result->isUsed && strcmp(argToChange.id, result->id) == 0);
+}
+
+TestResult queueIsEmptyMethodReturnsFalseIfEmpty()
+{
+    Queue *sut = initQueue();
+
+    bool result = isEmpty(*sut);
+
+    expect(result);
+}
+
+TestResult queuePeekReturnsNullIfEmpty()
+{
+    Queue *sut = initQueue();
+
+    void *result = peek(*sut);
+
+    expect(result == NULL);
+}
+
+TestResult queuePushAddsElementToTheEnd()
+{
+    int value = 10;
+    Queue *sut = initQueue();
+
+    push(sut, &value);
+    int *result = (int *)peek(*sut);
+
+    expect(!isEmpty(*sut) && *result == value);
+}
+
+TestResult queuePopReturnsNullIfEmpty()
+{
+    Queue *sut = initQueue();
+
+    void *result = pop(sut);
+
+    expect(result == NULL);
+}
+
+TestResult queuePopReturnsFirstElementAndRemovesIt()
+{
+    int value = 10;
+    Queue *sut = initQueue();
+    push(sut, &value);
+
+    int *result = (int *)pop(sut);
+
+    expect(isEmpty(*sut) && peek(*sut) == NULL && *result == value);
+}
+
+TestResult queueMultipleValuesCanBePushed()
+{
+    int values[] = { 10, 20, 30 };
+    int n = sizeof(values) / sizeof(int);
+    Queue *sut = initQueue();
+    for (int i = 0; i < n; i++) {
+        push(sut, &values[i]);
+    }
+
+    int results[3];
+    for (int i = 0; i < n; i++) {
+        int *value = pop(sut);
+        results[i] = *value;
+    }
+
+    expect(
+        values[0] == results[0]
+        && values[1] == results[1]
+        && values[2] == results[2]
+        && isEmpty(*sut)
+        && peek(*sut) == NULL
+    );
 }

@@ -13,9 +13,22 @@ typedef struct _CThread {
 } _CThread;
 
 void *runner(void *args);
+_CThread *unwrapPrivate(CThread thread);
 pthread_attr_t getAttributes(CThreadParams *params);
 
 #pragma mark - Public Definitions
+
+void *getArgs(CThread thread)
+{
+    return unwrapPrivate(thread)->args;
+}
+
+void setArgs(CThread *thread, void *args)
+{
+    _CThread *private = unwrapPrivate(*thread);
+
+    private->args = args;
+}
 
 CThread *createThreadWithParams(CThreadParams params, Callback callback, void *args)
 {
@@ -41,7 +54,7 @@ CThread *createThread(Callback callback, void *args)
 
 CThreadStatus startThread(CThread *thread)
 {
-    _CThread *t = (_CThread *)thread->private;
+    _CThread *t = unwrapPrivate(*thread);
 
     if (t == NULL) {
         return CThreadStatusErrorRestart;
@@ -75,6 +88,11 @@ void *runner(void *args)
 
     free(t);
     pthread_exit(NULL);
+}
+
+_CThread *unwrapPrivate(CThread thread)
+{
+    return (_CThread *)thread.private;
 }
 
 pthread_attr_t getAttributes(CThreadParams *params)
