@@ -1,4 +1,3 @@
-#include "internal/queue.h"
 #include <cthread.h>
 #include <lauxlib.h>
 #include <lua.h>
@@ -15,6 +14,33 @@ typedef struct LuaThreadState {
     int nargs;
     Queue args;
 } LuaThreadState;
+
+typedef enum LuaType {
+    NIL = 0,
+    NUMBER,
+    BOOLEAN,
+    STRING,
+    TABLE,
+    FUNCTION,
+    USERDATA,
+    THREAD,
+    LIGHTUSERDATA
+} LuaType;
+
+typedef struct LuaValue {
+    LuaType type;
+
+    union {
+        double number;
+        bool boolean;
+        char *string;
+        void *table;
+        void *function;
+        void *userData;
+        void *coroutine;
+        void *lightUserData;
+    };
+} LuaValue;
 
 void runCode(void *args)
 {
@@ -41,8 +67,8 @@ void runCode(void *args)
 
     if (state->nargs > 0) {
         for (int i = 0; i < state->nargs; i++) {
-            int *num = pop(&state->args);
-            lua_pushnumber(state->L, *num);
+            int num = (int)pop(&state->args);
+            lua_pushnumber(state->L, num);
         }
     }
 
@@ -89,6 +115,13 @@ static int createLuaThread(lua_State *L)
     return 1;
 }
 
+LuaValue getLuaValue(lua_State *L, int index)
+{
+    LuaValue value;
+
+    lua_i
+}
+
 static int startLuaThread(lua_State *L)
 {
     int nargs = lua_gettop(L);
@@ -99,11 +132,12 @@ static int startLuaThread(lua_State *L)
 
         // TODO: Allow to pass something other than numbers
         if (lua_isnumber(L, stackIndex)) {
-            int num = (int)lua_tonumber(L, stackIndex);
-            push(args, &num);
+            void *ptr = NULL;
+            double num = lua_tonumber(L, stackIndex);
+            ptr = (void *)num;
+            push(args, ptr);
         }
     }
-
 
     CThread *threadData = getThreadState(L, 0 - nargs);
     LuaThreadState *state = (LuaThreadState *)getArgs(*threadData);
