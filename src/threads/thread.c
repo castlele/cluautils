@@ -16,15 +16,12 @@ typedef struct LuaThreadState {
 } LuaThreadState;
 
 typedef enum LuaType {
-    NIL = 0,
-    NUMBER,
-    BOOLEAN,
-    STRING,
-    TABLE,
-    FUNCTION,
-    USERDATA,
-    THREAD,
-    LIGHTUSERDATA
+    LuaTypeNil,
+    LuaTypeNumber,
+    LuaTypeBoolean,
+    LuaTypeString,
+    LuaTypeUserData,
+    LuaTypeFunction,
 } LuaType;
 
 typedef struct LuaValue {
@@ -33,14 +30,69 @@ typedef struct LuaValue {
     union {
         double number;
         bool boolean;
-        char *string;
-        void *table;
-        void *function;
+        const char *string;
+        lua_CFunction function;
         void *userData;
-        void *coroutine;
-        void *lightUserData;
     };
 } LuaValue;
+
+LuaValue *getLuaValue(lua_State *L, int index)
+{
+    LuaValue *value = malloc(sizeof(LuaValue));
+
+    switch (lua_type(L, index)) {
+        case LUA_TNIL:
+            value->type = LuaTypeNil;
+            break;
+        case LUA_TNUMBER:
+            value->type = LuaTypeNumber;
+            value->number = lua_tonumber(L, index);
+            break;
+        case LUA_TBOOLEAN:
+            value->type = LuaTypeBoolean;
+            value->boolean = lua_toboolean(L, index);
+            break;
+        case LUA_TSTRING:
+            value->type = LuaTypeString;
+            value->string = lua_tostring(L, index);
+            break;
+        case LUA_TLIGHTUSERDATA:
+        case LUA_TUSERDATA:
+            value->type = LuaTypeUserData;
+            value->userData = lua_touserdata(L, index);
+            break;
+        case LUA_TFUNCTION:
+            value->type = LuaTypeFunction;
+            value->function = lua_tocfunction(L, index);
+            break;
+    }
+
+    return value;
+}
+
+void pushLuaValue(lua_State *L, LuaValue *value)
+{
+    switch (value->type) {
+        case LuaTypeNil:
+            lua_pushnil(L);
+            break;
+        case LuaTypeNumber:
+            lua_pushnumber(L, value->number);
+            break;
+        case LuaTypeBoolean:
+            lua_pushboolean(L, value->boolean);
+            break;
+        case LuaTypeString:
+            lua_pushstring(L, value->string);
+            break;
+        case LuaTypeUserData:
+            lua_pushlightuserdata(L, value->userData);
+            break;
+        case LuaTypeFunction:
+            lua_pushcfunction(L, value->function);
+            break;
+    }
+}
 
 void runCode(void *args)
 {
@@ -67,8 +119,8 @@ void runCode(void *args)
 
     if (state->nargs > 0) {
         for (int i = 0; i < state->nargs; i++) {
-            int num = (int)pop(&state->args);
-            lua_pushnumber(state->L, num);
+            LuaValue *value = (LuaValue *)pop(&state->args);
+            pushLuaValue(state->L, value);
         }
     }
 
@@ -115,13 +167,6 @@ static int createLuaThread(lua_State *L)
     return 1;
 }
 
-LuaValue getLuaValue(lua_State *L, int index)
-{
-    LuaValue value;
-
-    lua_i
-}
-
 static int startLuaThread(lua_State *L)
 {
     int nargs = lua_gettop(L);
@@ -129,14 +174,8 @@ static int startLuaThread(lua_State *L)
 
     for (int i = 1; i < nargs; i++) {
         int stackIndex = i - nargs;
-
-        // TODO: Allow to pass something other than numbers
-        if (lua_isnumber(L, stackIndex)) {
-            void *ptr = NULL;
-            double num = lua_tonumber(L, stackIndex);
-            ptr = (void *)num;
-            push(args, ptr);
-        }
+        LuaValue *value = getLuaValue(L, stackIndex);
+        push(args, value);
     }
 
     CThread *threadData = getThreadState(L, 0 - nargs);
