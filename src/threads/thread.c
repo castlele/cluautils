@@ -40,21 +40,26 @@ LuaValue *getLuaValue(lua_State *L, int index)
 {
     LuaValue *value = malloc(sizeof(LuaValue));
 
+    // TODO: Implement loggin system
     switch (lua_type(L, index)) {
         case LUA_TNIL:
+            printf("Got nil value\n");
             value->type = LuaTypeNil;
             break;
         case LUA_TNUMBER:
             value->type = LuaTypeNumber;
             value->number = lua_tonumber(L, index);
+            printf("Got number value: %f\n", value->number);
             break;
         case LUA_TBOOLEAN:
             value->type = LuaTypeBoolean;
             value->boolean = lua_toboolean(L, index);
+            printf("Got boolean value: %s\n", value->boolean ? "true" : "false");
             break;
         case LUA_TSTRING:
             value->type = LuaTypeString;
             value->string = lua_tostring(L, index);
+            printf("Got string value: %s\n", value->string);
             break;
         case LUA_TLIGHTUSERDATA:
         case LUA_TUSERDATA:
@@ -134,8 +139,9 @@ void runCode(void *args)
 
 CThread *getThreadState(lua_State *L, int index)
 {
+    // TODO: Constants
     lua_getfield(L, index, "threadData");
-    CThread *threadData = (CThread *)lua_touserdata(L, index + 1);
+    CThread *threadData = (CThread *)lua_touserdata(L, lua_gettop(L));
 
     if (threadData == NULL) {
         // TODO: Add proper exception handling
@@ -179,10 +185,16 @@ static int startLuaThread(lua_State *L)
     }
 
     CThread *threadData = getThreadState(L, 0 - nargs);
-    LuaThreadState *state = (LuaThreadState *)getArgs(*threadData);
-    state->args = *args;
-    state->nargs = nargs - 1;
-    CThreadStatus status = startThread(threadData);
+    CThreadStatus status;
+
+    if (threadData) {
+        LuaThreadState *state = (LuaThreadState *)getArgs(*threadData);
+        state->args = *args;
+        state->nargs = nargs - 1;
+        CThreadStatus status = startThread(threadData);
+    } else {
+        status = CThreadStatusError;
+    }
 
     // TODO: Update handling or remove
     switch (status) {
@@ -203,7 +215,12 @@ static int startLuaThread(lua_State *L)
 static int waitLuaThread(lua_State *L)
 {
     CThread *threadData = getThreadState(L, 1);
-    waitThread(threadData);
+
+    // TODO: Error handling here
+    if (threadData) {
+        waitThread(threadData);
+    }
+
     return 0;
 }
 

@@ -1,8 +1,8 @@
 package = "cluautils"
-version = "1.13-0"
+version = "1.14-0"
 source = {
     url = "git+ssh://git@github.com/castlele/cluautils.git",
-    tag = "1.13.0"
+    tag = "1.14.0"
 }
 description = {
    homepage = "*** please enter a project homepage ***",
@@ -27,7 +27,11 @@ build = {
       ["cluautils.table_utils"] = "src/table_utils/table_utils.lua",
       ["cluautils.functions"] = "src/functions/functions.lua",
       ["cluautils.thread"] = {
-         sources = { "src/threads/thread.c", "src/threads/internal/cthread.c" },
+         sources = {
+            "src/threads/thread.c",
+            "src/threads/internal/cthread.c",
+            "src/threads/internal/queue.c"
+         },
          libdirs = { "src/threads/bin/" },
          incdirs = { "src/threads/internal/" },
       },

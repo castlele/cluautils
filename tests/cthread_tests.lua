@@ -59,4 +59,19 @@ f:close()
 
       assertOutput(10)
    end)
+
+   t.it("Nil, number, boolean, string can be passed to thread", function ()
+      local code = [[
+      local arg = {...}
+      assert(arg[1] == nil, "First argument isn't nil.")
+      assert(arg[2] == 22, "Second argument isn't a number.")
+      assert(arg[3] == false, "Third argument isn't a boolean.")
+      assert(arg[4] == "hello, world", "Fourth argument isn't a string.")
+      ]]
+      local sut = thread.create(code)
+
+      thread.start(sut, nil, 22, false, "hello, world")
+      -- TODO: add result checking with wait method
+      thread.wait(sut)
+   end)
 end)
