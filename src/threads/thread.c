@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "lualibutils.h"
+
 #pragma mark - Private Definitions
 
 typedef struct LuaThreadState {
@@ -233,24 +235,11 @@ static const struct luaL_Reg thread[] = {
     {NULL, NULL},
 };
 
-void registerFields(lua_State *L)
-{
-    int index = 0;
-    luaL_Reg reg;
-
-    while ((reg = thread[index]).name != NULL) {
-        lua_pushstring(L, reg.name);
-        lua_pushcfunction(L, reg.func);
-        lua_settable(L, -3);
-        index++;
-    }
-}
-
 int luaopen_cluautils_thread(lua_State *L)
 {
     lua_createtable(L, 0, 1);
 
-    registerFields(L);
+    registerFields(L, thread);
 
     return 1;
 }

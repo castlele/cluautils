@@ -1,8 +1,8 @@
 package = "cluautils"
-version = "1.14-0"
+version = "1.15-0"
 source = {
     url = "git+ssh://git@github.com/castlele/cluautils.git",
-    tag = "1.14.0"
+    tag = "1.15.0"
 }
 description = {
    homepage = "*** please enter a project homepage ***",
@@ -12,6 +12,9 @@ dependencies = {
     "lua ~> 5.1",
     "json-lua >= 0.1"
 }
+
+local incDir = "./internal"
+
 build = {
    type = "builtin",
    modules = {
@@ -26,6 +29,12 @@ build = {
       ["cluautils.string_utils"] = "src/string_utils/string_utils.lua",
       ["cluautils.table_utils"] = "src/table_utils/table_utils.lua",
       ["cluautils.functions"] = "src/functions/functions.lua",
+      ["cluautils.memory"] = {
+         sources = {
+            "./src/memory/memory.c"
+         },
+         incdirs = { incDir },
+      },
       ["cluautils.thread"] = {
          sources = {
             "src/threads/thread.c",
@@ -33,7 +42,10 @@ build = {
             "src/threads/internal/queue.c"
          },
          libdirs = { "src/threads/bin/" },
-         incdirs = { "src/threads/internal/" },
+         incdirs = {
+            incDir,
+            "src/threads/internal/",
+         },
       },
    },
    copy_directories = {

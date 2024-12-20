@@ -2,6 +2,8 @@ CC=clang
 CFLAGS=-arch arm64
 ARCHIVE_CFLAGS=-shared -fPIC $(CFLAGS)
 
+INTERNAL_FILES=-I./internal/
+
 SRC_FOLDER=src
 THREAD_SRC=$(SRC_FOLDER)/threads
 THREAD_BIN=$(THREAD_SRC)/bin
@@ -15,8 +17,8 @@ THREAD_INCLUDE=-I./$(THREAD_INTERNAL)/
 
 THREAD_CFILES=$(THREAD_SRC)/thread.c
 THREAD_BINARY=thread.so
-MEMORY_CFILES=$(MEMORY_SRC)/cmemory.c
-MEMORY_BINARY=cmemory.so
+MEMORY_CFILES=$(MEMORY_SRC)/memory.c
+MEMORY_BINARY=memory.so
 
 
 THREAD_LIBS=-L./$(THREAD_BIN)/ -lcthread
@@ -34,11 +36,11 @@ test_thread: compile_thread
 
 build_memory:
 	clear
-	$(CC) $(ARCHIVE_CFLAGS) $(LIBS) $(MEMORY_CFILES) -o $(MEMORY_BIN)/$(MEMORY_BINARY)
+	$(CC) $(ARCHIVE_CFLAGS) $(LIBS) $(MEMORY_CFILES) $(INTERNAL_FILES) -o $(MEMORY_BIN)/$(MEMORY_BINARY)
 
 build_thread: compile_thread
 	clear
-	$(CC) $(ARCHIVE_CFLAGS) $(LIBS) $(THREAD_LIBS) $(THREAD_INCLUDE) $(THREAD_CFILES) -o $(THREAD_BIN)/$(THREAD_BINARY)
+	$(CC) $(ARCHIVE_CFLAGS) $(LIBS) $(THREAD_LIBS) $(THREAD_INCLUDE) $(INTERNAL_FILES) $(THREAD_CFILES) -o $(THREAD_BIN)/$(THREAD_BINARY)
 
 compile_thread:
 	clear
