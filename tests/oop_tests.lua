@@ -1,14 +1,20 @@
 local t = require("src.tests")
 local CObject = require("src.cobject")
 
+---@param obj CObject
+---@diagnostic disable
+local function expectDefaultMethods(obj)
+      t.expect(obj.init, "No 'init' method on the object")
+      t.expect(obj.new, "No 'new' method on the object")
+      t.expect(obj.extend, "No 'extend' method on the object")
+      t.expect(obj.isInstance, "No 'isInstance' method on the object")
+end
+
 t.describe("OOP tests", function()
    t.it("Default available methods on CObject type", function()
       local sut = CObject()
 
-      t.expect(sut.init, "No 'init' method on the object")
-      t.expect(sut.new, "No 'new' method on the object")
-      t.expect(sut.extend, "No 'extend' method on the object")
-      t.expect(sut.isInstance, "No 'isInstance' method on the object")
+      expectDefaultMethods(sut)
    end)
 
    t.it("Copy of the class object is an instance of it", function ()
@@ -25,5 +31,12 @@ t.describe("OOP tests", function()
 
       t.expect(not instance1:isInstance(instance2), "Instance 1 is instance of instance 2")
       t.expect(not instance2:isInstance(instance1), "Instance 2 is instance of instance 1")
+   end)
+
+   t.it("Ancestors of CObject inherit all its methods", function ()
+      local obj = CObject()
+      local sut = obj:extend()
+
+      expectDefaultMethods(sut)
    end)
 end)

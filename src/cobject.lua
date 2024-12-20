@@ -1,3 +1,5 @@
+local memory = require("cluautils.memory")
+
 ---@class CObject
 ---@field protected __uuid string
 local CObject = {}
@@ -35,8 +37,6 @@ function CObject:extend(obj)
    end
 
    local this = copyObject(self, obj)
-   -- TODO: Generate UUID
-   this.__uuid = "abc"
    local mt = {}
 
    mt.__call = newObject
@@ -65,7 +65,7 @@ end
 ---@param other CObject
 ---@return boolean
 function CObject:isInstance(other)
-   return self.__uuid == other.__uuid
+   return memory.get(self) == memory.get(other)
 end
 
 

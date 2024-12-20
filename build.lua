@@ -8,5 +8,6 @@ conf = {
    memoryTest = [[
       bear -- make build
       ./run_tests.sh "cmemory*"
-   ]]
+   ]],
+   oopTest = "./run_tests.sh \"oop*\""
 }
