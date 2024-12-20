@@ -1,3 +1,4 @@
+---@diagnostic disable-next-line
 conf = {
    install = "luarocks make",
    threadTest = [[
@@ -9,5 +10,6 @@ conf = {
       bear -- make build
       ./run_tests.sh "cmemory*"
    ]],
-   oopTest = "./run_tests.sh \"oop*\""
+   oopTest = "./run_tests.sh \"oop*\"",
+   collectionInterfaceTest = "./run_tests.sh \"collection_interface*\"",
 }

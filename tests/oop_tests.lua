@@ -8,6 +8,7 @@ local function expectDefaultMethods(obj)
       t.expect(obj.new, "No 'new' method on the object")
       t.expect(obj.extend, "No 'extend' method on the object")
       t.expect(obj.isInstance, "No 'isInstance' method on the object")
+      t.expect(obj.toString, "No 'toString' method on the object")
 end
 
 t.describe("OOP tests", function()
@@ -38,5 +39,20 @@ t.describe("OOP tests", function()
       local sut = obj:extend()
 
       expectDefaultMethods(sut)
+   end)
+
+   t.it("Be default toString methods returns address of the object", function ()
+      local sut = CObject()
+      local addr = require("cluautils.memory").get(sut)
+      local expected = sut.__name .. ":" ..  addr
+
+      local result = sut:toString()
+
+      t.expect(
+         expected == result,
+         "'toString' result isn't equal to object's memory address. "
+         .. "Expected: " .. expected .. ". "
+         .. "Got: " .. result
+      )
    end)
 end)

@@ -1,3 +1,5 @@
+--@TODO: Move out of collections module
+
 ---@alias T any
 ---@class Pair<T>
 ---@field left T

@@ -1,6 +1,6 @@
 require("cluautils.table_utils")
-local LinkedList = require("cluautils.datastructures.linkedlist")
-local Pair = require("cluautils.datastructures.pair")
+local LinkedList = require("cluautils.collections.linkedlist")
+local Pair = require("cluautils.collections.pair")
 
 ---@class HashMap
 ---@field private length integer

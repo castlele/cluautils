@@ -1,21 +1,22 @@
 local memory = require("cluautils.memory")
 
 ---@class CObject
----@field protected __uuid string
+---@field protected __name string
 local CObject = {}
 
 
 ---@param obj CObject
+---@param name string?
 ---@param ... any
 ---@return CObject
-local function newObject(obj, ...)
-   return obj:new(...)
+local function newObject(obj, name, ...)
+   return obj:new(name, ...)
 end
 
----@param obj? table
+---@param obj table?
+---@param name string?
 ---@return CObject
-function CObject:extend(obj)
-
+function CObject:extend(obj, name)
    ---@param target CObject
    ---@param destination? CObject
    ---@return CObject
@@ -37,6 +38,7 @@ function CObject:extend(obj)
    end
 
    local this = copyObject(self, obj)
+   this.__name = name or self.__name or "CObject"
    local mt = {}
 
    mt.__call = newObject
@@ -49,11 +51,12 @@ end
 ---@param ... any
 function CObject:init(...) end
 
+---@param name string?
 ---@param ... any
 ---@return CObject
-function CObject:new(...)
+function CObject:new(name, ...)
    ---@type CObject
-   local this = self:extend({})
+   local this = self:extend({}, name)
 
    if this.init then
       this:init(...)
@@ -66,6 +69,11 @@ end
 ---@return boolean
 function CObject:isInstance(other)
    return memory.get(self) == memory.get(other)
+end
+
+---@return string
+function CObject:toString()
+   return self.__name .. ":" .. memory.get(self)
 end
 
 

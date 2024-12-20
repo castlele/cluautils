@@ -1,5 +1,5 @@
 local t = require("src.tests")
-local HashMap = require("src.datastructures.hashmap")
+local HashMap = require("src.collections.hashmap")
 
 t.describe("Hash Map tests", function ()
    t.it("test_init_method_creates_empty_table", function ()

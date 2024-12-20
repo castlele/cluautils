@@ -1,8 +1,10 @@
+---@diagnostic disable
+
 package = "cluautils"
-version = "1.16-0"
+version = "1.16-1"
 source = {
     url = "git+ssh://git@github.com/castlele/cluautils.git",
-    tag = "1.16.0"
+    tag = "1.16.1"
 }
 description = {
    homepage = "*** please enter a project homepage ***",
@@ -19,9 +21,10 @@ build = {
    type = "builtin",
    modules = {
       ["cluautils"] = "src/cluautils.lua",
-      ["cluautils.datastructures.linkedlist"] = "src/datastructures/linkedlist.lua",
-      ["cluautils.datastructures.hashmap"] = "src/datastructures/hashmap.lua",
-      ["cluautils.datastructures.pair"] = "src/datastructures/pair.lua",
+      ["cluautils.collections.collection_inteface"] = "./src/collections/collection_interface.lua",
+      ["cluautils.collections.linkedlist"] = "src/collections/linkedlist.lua",
+      ["cluautils.collections.hashmap"] = "src/collections/hashmap.lua",
+      ["cluautils.collections.pair"] = "src/collections/pair.lua",
       ["cluautils.json"] = "src/json/json.lua",
       ["cluautils.tests"] = "src/tests.lua",
       ["cluautils.tests.base_test_case"] = "src/tests/base_test_case.lua",

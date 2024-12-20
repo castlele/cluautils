@@ -1,6 +1,6 @@
 require("cluautils.table_utils")
 local t = require("src.tests")
-local LinkedList = require("src.datastructures.linkedlist")
+local LinkedList = require("src.collections.linkedlist")
 
 t.describe("Linked list tests", function ()
 
