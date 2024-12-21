@@ -1,9 +1,10 @@
-#include <cthread.h>
 #include <clock.h>
+#include <cthread.h>
 #include <queue.h>
-#include <stdio.h>
-#include <string.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #pragma mark - Utils
@@ -41,6 +42,7 @@ void test(TestResult (*func)())
 #pragma mark - Test Cases List
 
 TestResult threadCanBeCreatedAndWaitedByParentThread();
+TestResult threadCanGetResultsOfThreadCallbackInWaitFunction();
 TestResult mutextSynchronizesGlobalState();
 TestResult argumentCanBeTakenFromThread();
 TestResult argumentCanBeChangedAfterCreationOfTheThread();
@@ -53,6 +55,7 @@ TestResult queueMultipleValuesCanBePushed();
 
 TestResult (*tests[])() = {
     threadCanBeCreatedAndWaitedByParentThread,
+    threadCanGetResultsOfThreadCallbackInWaitFunction,
     mutextSynchronizesGlobalState,
     argumentCanBeTakenFromThread,
     argumentCanBeChangedAfterCreationOfTheThread,
@@ -87,13 +90,22 @@ typedef struct Argument {
 
 int globalState;
 
-void testFunction(void *args)
+void *testFunction(void *args)
 {
     Argument *arg = (Argument *)args;
     arg->isUsed = true;
+    return NULL;
 }
 
-void addMillionGlobalState(void *args)
+void *returningFunction(void *args)
+{
+    void *ptr;
+    ptr = "Done";
+
+    return ptr;
+}
+
+void *addMillionGlobalState(void *args)
 {
     CLock *lock = (CLock *)args;
 
@@ -102,6 +114,7 @@ void addMillionGlobalState(void *args)
         globalState++;
         mutexUnlock(lock);
     }
+    return NULL;
 }
 
 TestResult threadCanBeCreatedAndWaitedByParentThread()
@@ -112,7 +125,19 @@ TestResult threadCanBeCreatedAndWaitedByParentThread()
     CThreadStatus result = startThread(sut);
     waitThread(sut);
 
+    free(sut);
     expect(result == CThreadStatusOk && arg.isUsed);
+}
+
+TestResult threadCanGetResultsOfThreadCallbackInWaitFunction()
+{
+    CThread *sut = createThread(returningFunction, NULL);
+
+    CThreadStatus result = startThread(sut);
+    void *waitingStatus = waitThread(sut);
+
+    free(sut);
+    expect(strcmp((char *)waitingStatus, "Done") == 0 && result == CThreadStatusOk);
 }
 
 TestResult mutextSynchronizesGlobalState()
@@ -135,6 +160,7 @@ TestResult mutextSynchronizesGlobalState()
 
     for (int i = 0; i < threadsCount; i++) {
         waitThread(sut[i]);
+        free(sut[i]);
     }
 
     sprintf(errorMessage, "Wrong sum. Expected %i, got: %i", expectedResult, globalState);
@@ -148,6 +174,7 @@ TestResult argumentCanBeTakenFromThread()
 
     Argument *result = (Argument *)getArgs(*sut);
 
+    free(sut);
     expect(result->isUsed && strcmp(args.id, result->id) == 0);
 }
 
@@ -160,6 +187,7 @@ TestResult argumentCanBeChangedAfterCreationOfTheThread()
     setArgs(sut, &argToChange);
     Argument *result = (Argument *)getArgs(*sut);
 
+    free(sut);
     expect(result->isUsed && strcmp(argToChange.id, result->id) == 0);
 }
 
@@ -169,6 +197,7 @@ TestResult queueIsEmptyMethodReturnsFalseIfEmpty()
 
     bool result = isEmpty(*sut);
 
+    free(sut);
     expect(result);
 }
 
@@ -178,6 +207,7 @@ TestResult queuePeekReturnsNullIfEmpty()
 
     void *result = peek(*sut);
 
+    free(sut);
     expect(result == NULL);
 }
 
@@ -189,7 +219,9 @@ TestResult queuePushAddsElementToTheEnd()
     push(sut, &value);
     int *result = (int *)peek(*sut);
 
-    expect(!isEmpty(*sut) && *result == value);
+    bool isEmptyStatus = isEmpty(*sut);
+    free(sut);
+    expect(!isEmptyStatus && *result == value);
 }
 
 TestResult queuePopReturnsNullIfEmpty()
@@ -198,6 +230,7 @@ TestResult queuePopReturnsNullIfEmpty()
 
     void *result = pop(sut);
 
+    free(sut);
     expect(result == NULL);
 }
 
@@ -209,7 +242,10 @@ TestResult queuePopReturnsFirstElementAndRemovesIt()
 
     int *result = (int *)pop(sut);
 
-    expect(isEmpty(*sut) && peek(*sut) == NULL && *result == value);
+    bool isEmptyStatus = isEmpty(*sut);
+    void *top = peek(*sut);
+    free(sut);
+    expect(isEmptyStatus && top == NULL && *result == value);
 }
 
 TestResult queueMultipleValuesCanBePushed()
@@ -227,11 +263,14 @@ TestResult queueMultipleValuesCanBePushed()
         results[i] = *value;
     }
 
+    bool isEmptyStatus = isEmpty(*sut);
+    void *top = peek(*sut);
+    free(sut);
     expect(
         values[0] == results[0]
         && values[1] == results[1]
         && values[2] == results[2]
-        && isEmpty(*sut)
-        && peek(*sut) == NULL
+        && isEmptyStatus
+        && top == NULL
     );
 }
