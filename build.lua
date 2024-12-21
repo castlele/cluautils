@@ -12,4 +12,5 @@ conf = {
    ]],
    oopTest = "./run_tests.sh \"oop*\"",
    collectionInterfaceTest = "./run_tests.sh \"collection_interface*\"",
+   hashMapTest = "./run_tests.sh \"hashmap*\""
 }

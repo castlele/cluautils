@@ -5,6 +5,9 @@ t.describe("Hash Map tests", function ()
    t.it("test_init_method_creates_empty_table", function ()
       local sut = HashMap()
 
+      print(sut:toString())
+      print(sut:len())
+
       t.expect(sut:isEmpty())
    end)
 

@@ -1,4 +1,5 @@
 require("cluautils.table_utils")
+local CollectionInterface = require("cluautils.collections.collection_inteface")
 local LinkedList = require("cluautils.collections.linkedlist")
 local Pair = require("cluautils.collections.pair")
 
@@ -6,7 +7,19 @@ local Pair = require("cluautils.collections.pair")
 ---@field private length integer
 ---@field private storage table|LinkedList
 ---@field private hashFunction fun(item: any): integer
-local HashMap = {}
+---@diagnostic disable-next-line
+local HashMap = CollectionInterface:extend()
+---
+---@param obj table?
+---@param name string?
+---@return HashMap
+function HashMap:extend(obj, name)
+   ---@type HashMap
+   ---@diagnostic disable-next-line
+   local map = CollectionInterface.extend(self, obj, name or "HashMap")
+
+   return map
+end
 
 
 ---@param item any
@@ -28,27 +41,21 @@ end
 ---@param capacity integer?
 ---@param hashFunction (fun(item: any): integer)?
 ---@return HashMap
-function HashMap:new(predefinedValues, capacity, hashFunction)
-   capacity = capacity
-
-   ---@type HashMap
-   local this = {
-      length = capacity or 0,
-      storage = {},
-      hashFunction = hashFunction or simpleHashFunction,
-   }
-
-   setmetatable(this, self)
+function HashMap:init(predefinedValues, capacity, hashFunction)
+   self.length = capacity or 0
+   self.storage = {}
+   self.hashFunction = hashFunction or simpleHashFunction
 
    if predefinedValues then
       for key, value in pairs(predefinedValues) do
-         this:put(key, value)
+         self:put(key, value)
       end
    end
+end
 
-   self.__index = self
-
-   return this
+---@return integer
+function HashMap:len()
+   return self.length
 end
 
 ---@return boolean
@@ -125,8 +132,9 @@ function HashMap:remove(key)
    return false
 end
 
+return HashMap
 
-return setmetatable({}, {
-   __call = HashMap.new,
-   __index = HashMap,
-})
+-- return setmetatable({}, {
+--    __call = HashMap.new,
+--    __index = HashMap,
+-- })
