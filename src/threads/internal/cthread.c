@@ -39,9 +39,11 @@ CThread *createThreadWithParams(CThreadParams params, Callback callback, void *a
     CThread *t = malloc(sizeof(CThread));
 
     // TODO: How to pass id to thread?
+    // TODO: Create uuid module!
     t->id = "hello";
     t->params = params;
     t->private = malloc(sizeof(_CThread));
+    t->isRunning = false;
     *(_CThread *)(t->private) = private;
 
     return t;
@@ -54,6 +56,10 @@ CThread *createThread(Callback callback, void *args)
 
 CThreadStatus startThread(CThread *thread)
 {
+    if (thread == NULL) {
+        return CThreadStatusErrorRestart;
+    }
+
     _CThread *t = unwrapPrivate(*thread);
 
     if (t == NULL) {
@@ -61,6 +67,7 @@ CThreadStatus startThread(CThread *thread)
     }
 
     pthread_attr_t attr = getAttributes(&thread->params);
+    thread->isRunning = true;
 
     int result = pthread_create(&thread->wrappedThread, &attr, runner, t);
 
@@ -73,9 +80,12 @@ CThreadStatus startThread(CThread *thread)
     return CThreadStatusOk;
 }
 
-void waitThread(CThread *thread)
+void *waitThread(CThread *thread)
 {
-    pthread_join(thread->wrappedThread, NULL);
+    void *result = NULL;
+    pthread_join(thread->wrappedThread, &result);
+
+    return result;
 }
 
 #pragma mark - Private definitions
@@ -84,10 +94,10 @@ void *runner(void *args)
 {
     _CThread *t = args;
 
-    t->callback(t->args);
+    void *result = t->callback(t->args);
 
     free(t);
-    pthread_exit(NULL);
+    pthread_exit(result);
 }
 
 _CThread *unwrapPrivate(CThread thread)

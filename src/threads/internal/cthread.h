@@ -16,10 +16,11 @@ typedef struct CThread {
     char *id;
     CThreadParams params;
     pthread_t wrappedThread;
+    bool isRunning;
     void *private;
 } CThread;
 
-typedef void (*Callback)(void *args);
+typedef void *(*Callback)(void *args);
 
 typedef enum CThreadStatus {
     CThreadStatusOk,
@@ -33,6 +34,6 @@ void setArgs(CThread *thread, void *args);
 CThread *createThreadWithParams(CThreadParams params, Callback callback, void *args);
 CThread *createThread(Callback callback, void *args);
 CThreadStatus startThread(CThread *thread);
-void waitThread(CThread *thread);
+void *waitThread(CThread *thread);
 
 #endif

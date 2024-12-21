@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <cthread.h>
 #include <lauxlib.h>
 #include <lua.h>
@@ -16,6 +17,17 @@ typedef struct LuaThreadState {
     int nargs;
     Queue args;
 } LuaThreadState;
+
+typedef enum LuaThreadErrorEnv {
+    LuaThreadErrorEnvFile,
+    LuaThreadErrorEnvString,
+    LuaThreadErrorEnvCall,
+} LuaThreadErrorEnv;
+
+typedef struct LuaThreadRunningError {
+    const char *message;
+    LuaThreadErrorEnv env;
+} LuaThreadRunningError;
 
 typedef enum LuaType {
     LuaTypeNil,
@@ -77,6 +89,20 @@ LuaValue *getLuaValue(lua_State *L, int index)
     return value;
 }
 
+int throwRestartError(lua_State *L)
+{
+    lua_pushboolean(L, false);
+    lua_pushstring(L, "Thread was started again! This is not allowed. One instance of the thread can be started only once!");
+    return 2;
+}
+
+int throwInternalError(lua_State *L)
+{
+    lua_pushboolean(L, false);
+    lua_pushstring(L, "Internal error occured! Pthread can't be started properly!");
+    return 2;
+}
+
 void pushLuaValue(lua_State *L, LuaValue *value)
 {
     switch (value->type) {
@@ -101,26 +127,27 @@ void pushLuaValue(lua_State *L, LuaValue *value)
     }
 }
 
-void runCode(void *args)
+void *runThread(void *args)
 {
+    // WARN: Is this object should be dealloceted here? Or in wait method?
     LuaThreadState *state = (LuaThreadState *)args;
+    assert(state);
 
-    if (state == NULL) {
-        // TODO: Throw error!
-        return;
-    }
+    LuaThreadRunningError *result = malloc(sizeof(LuaThreadRunningError));
 
     luaL_openlibs(state->L);
 
     if (access(state->code, F_OK) == 0) {
-        // TODO: Refactor messages
         if (luaL_loadfile(state->L, state->code)) {
-            printf("Can not load file: %s\n", lua_tostring(state->L, -1));
+            result->message = lua_tostring(state->L, -1);
+            result->env = LuaThreadErrorEnvFile;
+            return result;
         }
     } else {
-        // TODO: Refactor messages
         if (luaL_loadstring(state->L, state->code)) {
-            printf("Can not load code: %s\n", lua_tostring(state->L, -1));
+            result->message = lua_tostring(state->L, -1);
+            result->env = LuaThreadErrorEnvString;
+            return result;
         }
     }
 
@@ -131,12 +158,15 @@ void runCode(void *args)
         }
     }
 
-    // TODO: Refactor messages
     if (lua_pcall(state->L, state->nargs, 0, 0)) {
-        printf("Can not run code: %s\n", lua_tostring(state->L, -1));
+        result->message = lua_tostring(state->L, -1);
+        result->env = LuaThreadErrorEnvCall;
+        return result;
     }
 
     lua_close(state->L);
+
+    return NULL;
 }
 
 CThread *getThreadState(lua_State *L, int index)
@@ -145,10 +175,7 @@ CThread *getThreadState(lua_State *L, int index)
     lua_getfield(L, index, "threadData");
     CThread *threadData = (CThread *)lua_touserdata(L, lua_gettop(L));
 
-    if (threadData == NULL) {
-        // TODO: Add proper exception handling
-        printf("Can't find threaddata in start method\n");
-    }
+    assert(threadData);
 
     return threadData;
 }
@@ -163,7 +190,7 @@ static int createLuaThread(lua_State *L)
     threadState->code = code;
     threadState->nargs = 0;
 
-    CThread *threadData = createThread(runCode, threadState);
+    CThread *threadData = createThread(runThread, threadState);
 
     lua_createtable(L, 0, 1);
 
@@ -187,43 +214,57 @@ static int startLuaThread(lua_State *L)
     }
 
     CThread *threadData = getThreadState(L, 0 - nargs);
-    CThreadStatus status;
+    assert(threadData);
 
-    if (threadData) {
-        LuaThreadState *state = (LuaThreadState *)getArgs(*threadData);
+    if (threadData->isRunning) {
+        return throwRestartError(L);
+    }
+
+    LuaThreadState *state = (LuaThreadState *)getArgs(*threadData);
+
+    if (state != NULL) {
         state->args = *args;
         state->nargs = nargs - 1;
-        CThreadStatus status = startThread(threadData);
-    } else {
-        status = CThreadStatusError;
     }
 
-    // TODO: Update handling or remove
+    CThreadStatus status = startThread(threadData);
+
     switch (status) {
         case CThreadStatusOk:
-            printf("OK\n");
             break;
         case CThreadStatusErrorRestart:
-            printf("ERROR RESTART\n");
-            break;
+            return throwRestartError(L);
         case CThreadStatusError:
-            printf("ERROR\n");
-            break;
+            return throwInternalError(L);
     }
 
-    return 0;
+    lua_pushboolean(L, true);
+    return 1;
 }
 
 static int waitLuaThread(lua_State *L)
 {
     CThread *threadData = getThreadState(L, 1);
 
-    // TODO: Error handling here
-    if (threadData) {
-        waitThread(threadData);
+    assert(threadData);
+
+    LuaThreadRunningError *result = waitThread(threadData);
+
+    free(threadData);
+
+    // `runThread` method return result only if there is an error occured
+    if (result != NULL) {
+        // TODO: Add environment information
+        lua_pushboolean(L, false);
+        lua_pushstring(L, result->message);
+
+        free(result);
+
+        return 2;
     }
 
-    return 0;
+    lua_pushboolean(L, true);
+    return 1;
 }
 
 #pragma mark - Registration

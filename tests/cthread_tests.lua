@@ -35,8 +35,9 @@ f:close()
       local sut = thread.create(code)
 
       thread.start(sut)
-      thread.wait(sut)
+      local isSuccess, msg = thread.wait(sut)
 
+      t.expect(isSuccess, "Thread failed with message: '" .. (msg or "") .. "'")
       assertOutput()
    end)
 
@@ -45,8 +46,9 @@ f:close()
       local sut = thread.create(code)
 
       thread.start(sut)
-      thread.wait(sut)
+      local isSuccess, msg = thread.wait(sut)
 
+      t.expect(isSuccess, "Thread failed with message: '" .. (msg or "") .. "'")
       assertOutput()
    end)
 
@@ -55,8 +57,9 @@ f:close()
       local sut = thread.create(code)
 
       thread.start(sut, 10)
-      thread.wait(sut)
+      local isSuccess, msg = thread.wait(sut)
 
+      t.expect(isSuccess, "Thread failed with message: '" .. (msg or "") .. "'")
       assertOutput(10)
    end)
 
@@ -70,8 +73,31 @@ f:close()
       ]]
       local sut = thread.create(code)
 
-      thread.start(sut, nil, 22, false, "hello, world")
+      t.expect(thread.start(sut, nil, 22, false, "hello, world"), "Thread start failed")
       -- TODO: add result checking with wait method
+      t.expect(thread.wait(sut), "Thread wait failed")
+   end)
+
+   t.it("Wait method can get failed code exception", function ()
+      local code = "assert(false, 'This is an exception')"
+      local sut = thread.create(code)
+
+      thread.start(sut)
+      local result, msg = thread.wait(sut)
+
+      t.expect(not result, "Thread code was successful")
+      t.expect(msg, "Error message is nil")
+   end)
+
+   t.it("Thread can't be run multiple times", function ()
+      local code = "print('Hello, Javie')"
+      local sut = thread.create(code)
+
+      local firstResult = thread.start(sut)
+      local secondResult = thread.start(sut)
       thread.wait(sut)
+
+      t.expect(firstResult, "First start is successful")
+      t.expect(not secondResult, "Second start isn't an error")
    end)
 end)
