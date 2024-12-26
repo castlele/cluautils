@@ -1,20 +1,47 @@
-name: cluautils workflow       
+name: cluautils workflow
+
 on:
-  push
+  push:
+    branches: [ "*" ]
+  pull_request:
+    branches: [ "master" ]
+
 jobs:
-  install:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - uses: xpol/setup-lua@v1
+      - uses: actions/checkout@master
+
+      - uses: leafo/gh-actions-lua@v10
         with:
-          lua-version: "5.1.5"
-      - uses: leafo/gh-actions-luarocks@v2
+          luaVersion: "5.1.5"
+
+      - uses: leafo/gh-actions-luarocks@v4
         with:
           luarocksVersion: "3.0.0"
-      
-  build:
-    runs-on: ubuntu-latest
-    needs: install
-    steps:
+
       - name: build
-        run: sudo luarocks make
+        run: |
+          luarocks make
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@master
+
+      - uses: leafo/gh-actions-lua@v10
+        with:
+          luaVersion: "5.1.5"
+
+      - uses: leafo/gh-actions-luarocks@v4
+        with:
+          luarocksVersion: "3.0.0"
+      - name: publish-luarocks
+        env:
+          LUAROCKS_API_KEY: ${{ secrets.LUAROCKS_API_KEY }}
+        run: |
+          git config --global url."https://".insteadOf git://
+          luarocks install --local dkjson
+          luarocks upload cluautils-*.rockspec --api-key=$LUAROCKS_API_KEY --force
