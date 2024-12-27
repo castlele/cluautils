@@ -2,11 +2,20 @@
 
 tests_dir=./tests
 FILTER=$1
+IS_ANY_ERROR=0
+
+make clean
+make build
+make test_thread
 
 for test_file in $tests_dir/${FILTER}.lua; do
-    echo -e "\033[35mRunning tests for $test_file\033[0m"
-
     lua $test_file
 
-    echo -e "\033[35mTests finished for $test_file\033[0m"
+    if [[ $? -ne 0 ]]; then
+        IS_ANY_ERROR=1
+    fi
 done
+
+if [[ $IS_ANY_ERROR -ne 0 ]]; then
+    exit -1
+fi

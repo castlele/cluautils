@@ -28,6 +28,7 @@ TEST_BINARY=tests
 LIBS=-llua -ldl -lm -I/Users/castlelecs/.luaver/lua/5.1/include/ -L/Users/castlelecs/.luaver/lua/5.1/lib/
 
 build: build_thread build_memory
+test: test_thread
 
 test_thread: compile_thread
 	clear
