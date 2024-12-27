@@ -1,6 +1,13 @@
 require("src.file_manager.file_manager")
 local t = require("src.tests")
-local thread = assert(package.loadlib("./src/threads/bin/thread.so", "_luaopen_cluautils_thread"))()
+local localThreadPackage = package.loadlib("./src/threads/bin/thread.so", "_luaopen_cluautils_thread")
+local thread
+
+if not localThreadPackage then
+   thread = require("cluautils.thread")
+else
+   thread = localThreadPackage()
+end
 
 t.describe("Thread Module Tests", function ()
    ---@param maxValue integer?

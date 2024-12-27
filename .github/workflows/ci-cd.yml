@@ -33,12 +33,9 @@ jobs:
         with:
           luarocksVersion: "3.0.0"
 
-      - name: build
-        run: |
-          luarocks make
-
       - name: test
         run: |
+          luarocks make
           ./run_tests.sh "*"
 
   deploy:

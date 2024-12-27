@@ -1,5 +1,12 @@
 local t = require("src.tests")
-local memory = assert(package.loadlib("./src/memory/bin/memory.so", "_luaopen_cluautils_memory"))()
+local localMemoryPackage = package.loadlib("./src/memory/bin/memory.so", "_luaopen_cluautils_memory")
+local memory
+
+if not localMemoryPackage then
+   memory = require("cluautils.memory")
+else
+   memory = localMemoryPackage()
+end
 
 t.describe("Memory module tests", function ()
    t.it("Memory module gets address of the table", function ()

@@ -4,10 +4,6 @@ tests_dir=./tests
 FILTER=$1
 IS_ANY_ERROR=0
 
-make clean
-make build
-make test_thread
-
 for test_file in $tests_dir/${FILTER}.lua; do
     lua $test_file
 
