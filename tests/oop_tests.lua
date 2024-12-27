@@ -37,7 +37,6 @@ t.describe("OOP tests", function()
       local obj = CObject()
       local sut = obj:extend()
 
-      -- expectDefaultMethods(sut)
-      t.expect(false)
+      expectDefaultMethods(sut)
    end)
 end)
