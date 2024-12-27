@@ -2,3 +2,4 @@ check_report.txt
 .cache/
 **/*.o
 **/*.so
+cluautils/*

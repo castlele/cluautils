@@ -1,5 +1,9 @@
+---@diagnostic disable-next-line
 conf = {
    install = "luarocks make",
+   allTest = [[
+      ./run_tests.sh "*"
+   ]],
    threadTest = [[
       bear -- make build
       make test_thread

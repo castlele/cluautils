@@ -1,3 +1,5 @@
+OSNAME=$(shell uname)
+
 CC=clang
 CFLAGS=-arch arm64
 ARCHIVE_CFLAGS=-shared -fPIC $(CFLAGS)
@@ -20,14 +22,24 @@ THREAD_BINARY=thread.so
 MEMORY_CFILES=$(MEMORY_SRC)/memory.c
 MEMORY_BINARY=memory.so
 
-
-THREAD_LIBS=-L./$(THREAD_BIN)/ -lcthread
+THREAD_LIBS=
 TEST_SRC=tests/cthread_internal_tests.c
 TEST_BINARY=tests
 
+# TODO: Update paths somehow
 LIBS=-llua -ldl -lm -I/Users/castlelecs/.luaver/lua/5.1/include/ -L/Users/castlelecs/.luaver/lua/5.1/lib/
 
+ifeq ($(OSNAME), Darwin)
+	THREAD_LIBS=-L./$(THREAD_BIN)/ -lcthread
+endif
+
+ifeq ($(OSNAME), Linux)
+	THREAD_LIBS=-L./$(THREAD_BIN)/ -lcthread -pthread
+endif
+
+
 build: build_thread build_memory
+test: test_thread
 
 test_thread: compile_thread
 	clear

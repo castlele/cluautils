@@ -39,13 +39,20 @@ tests.describe = function(label, func)
    print(colorString(colorTable.YELLOW, "Test cases: " .. wrapWith(label, "'")))
    func()
 
+   local isAnyFailed = false
+
    for _, value in pairs(currentResults) do
       if not value then
+         isAnyFailed = true
          print(colorString(colorTable.RED, "Test cases failed: " .. wrapWith(label, "'")))
-         return
       end
    end
-      print(colorString(colorTable.YELLOW, "Test cases succeeded: " .. wrapWith(label, "'")))
+
+   if isAnyFailed then
+      os.exit(-1)
+   end
+
+   print(colorString(colorTable.YELLOW, "Test cases succeeded: " .. wrapWith(label, "'")))
 end
 
 tests.it = function(name, func)
