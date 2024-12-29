@@ -6,52 +6,54 @@ FM = FM or {}
 ---@param mode? readmode
 ---@return table
 function FM.get_lines_from_file(file, mode)
-    if file == nil then
-        return {}
-    end
+   if file == nil then
+      return {}
+   end
 
-    local result = {}
+   local result = {}
 
-    for line in file:lines(mode or "*l") do
-        table.insert(result, line)
-    end
+   for line in file:lines(mode or "*l") do
+      table.insert(result, line)
+   end
 
-    return result
+   return result
 end
 
 ---@param file_path string
 ---@return string?
 function FM.get_file_content(file_path)
-    if not FM.is_file_exists(file_path) then
-        return nil
-    end
+   if not FM.is_file_exists(file_path) then
+      return nil
+   end
 
-    local file = io.open(file_path, IOMODE.READ)
+   local file = io.open(file_path, IOMODE.READ)
 
-    if file == nil then
-        return nil
-    end
+   if file == nil then
+      return nil
+   end
 
-    local content = table.concat(FM.get_lines_from_file(file), "\n")
+   local content = table.concat(FM.get_lines_from_file(file), "\n")
 
-    return content
+   file:close()
+
+   return content
 end
 
 ---@MARK - File system manipulations
 
 FileType = {
-    DIR = "d",    -- directory
-    FILE = "f",   -- regular file
-    CHAR = "c",   -- character special
-    LINK = "l",   -- symbolic link
-    FIFO = "p",   -- FIFO
-    SOCKET = "s", -- socket
+   DIR = "d",    -- directory
+   FILE = "f",   -- regular file
+   CHAR = "c",   -- character special
+   LINK = "l",   -- symbolic link
+   FIFO = "p",   -- FIFO
+   SOCKET = "s", -- socket
 }
 
 IOMODE = {
-    READ = "r",
-    WRITE = "w",
-    OVERRIDE = "w+"
+   READ = "r",
+   WRITE = "w",
+   OVERRIDE = "w+"
 }
 
 ---Writes to file with writer function
@@ -59,21 +61,21 @@ IOMODE = {
 ---@param mode? openmode
 ---@param writer fun():string
 function FM.write_to_file(file_path, mode, writer)
-    local file = io.open(file_path, mode or IOMODE.WRITE)
+   local file = io.open(file_path, mode or IOMODE.WRITE)
 
-    if file == nil then
-        return
-    end
+   if file == nil then
+      return
+   end
 
-    file:write(writer())
+   file:write(writer())
 
-    io.close(file)
+   io.close(file)
 end
 
 ---Removes file at a given path
 ---@param file_path string
 function FM.delete_file(file_path)
-    os.remove(file_path)
+   os.remove(file_path)
 end
 
 ---Checks if file exists at the path
@@ -81,15 +83,15 @@ end
 ---@param mode?    openmode
 ---@return boolean
 function FM.is_file_exists(file_path, mode)
-    local file = io.open(file_path, mode or IOMODE.READ)
+   local file = io.open(file_path, mode or IOMODE.READ)
 
-    if file == nil then
-        return false
-    else
-        io.close(file)
+   if file == nil then
+      return false
+   else
+      io.close(file)
 
-        return true
-    end
+      return true
+   end
 end
 
 ---@class find
@@ -113,61 +115,61 @@ end
 ---@param param_table find
 ---@return table
 function FM.get_dir_content(param_table)
-    setmetatable(param_table, { __index = {
-        dir_path = ".",
-        file_type = nil,
-        name_pattern = "*",
-        max_depth = nil,
-    }})
+   setmetatable(param_table, { __index = {
+      dir_path = ".",
+      file_type = nil,
+      name_pattern = "*",
+      max_depth = nil,
+   }})
 
-    local dir_path = param_table.dir_path
-    local file_type = param_table.file_type
-    local name_pattern = param_table.name_pattern
-    local max_depth = param_table.max_depth
+   local dir_path = param_table.dir_path
+   local file_type = param_table.file_type
+   local name_pattern = param_table.name_pattern
+   local max_depth = param_table.max_depth
 
-    local sep = " "
-    local find_cmd = 'find "' .. dir_path .. '"'
-    local file_param = ""
-    local name_param = ""
-    local max_depth_param = ""
+   local sep = " "
+   local find_cmd = 'find "' .. dir_path .. '"'
+   local file_param = ""
+   local name_param = ""
+   local max_depth_param = ""
 
-    if not CUtils.is_string_nil_or_empty(file_type) then
-        file_param = '-type ' .. file_type
-    end
+   if not CUtils.is_string_nil_or_empty(file_type) then
+      file_param = '-type ' .. file_type
+   end
 
-    if not CUtils.is_string_nil_or_empty(name_pattern) then
-        name_param = '-name "' .. name_pattern .. '"'
-    end
+   if not CUtils.is_string_nil_or_empty(name_pattern) then
+      name_param = '-name "' .. name_pattern .. '"'
+   end
 
-    if type(max_depth) == "string" then
-        if CUtils.is_string_nil_or_empty(tostring(max_depth)) then
-            max_depth_param = '-maxdepth ' .. max_depth
-        end
-    elseif type(max_depth) == "number" and max_depth >= 0 then
-        max_depth_param = '-maxdepth ' .. tostring(max_depth)
-    end
+   if type(max_depth) == "string" then
+      if CUtils.is_string_nil_or_empty(tostring(max_depth)) then
+         max_depth_param = '-maxdepth ' .. max_depth
+      end
+   elseif type(max_depth) == "number" and max_depth >= 0 then
+      max_depth_param = '-maxdepth ' .. tostring(max_depth)
+   end
 
-    local full_cmd = find_cmd .. sep .. file_param .. sep .. name_param .. sep  .. max_depth_param
+   local full_cmd = find_cmd .. sep .. file_param .. sep .. name_param .. sep  .. max_depth_param
 
-    return FM.get_lines_from_file(io.popen(full_cmd, IOMODE.READ), "*l")
+   return FM.get_lines_from_file(io.popen(full_cmd, IOMODE.READ), "*l")
 end
 
 ---@param file_path string
 ---@return boolean false if error occured or file already exists else true
 function FM.create_file(file_path)
-    if FM.is_file_exists(file_path) then
-        return false
-    end
+   if FM.is_file_exists(file_path) then
+      return false
+   end
 
-    local file = io.open(file_path, IOMODE.WRITE)
+   local file = io.open(file_path, IOMODE.WRITE)
 
-    if type(file) == "string" or file == nil then
-        return false
-    end
+   if type(file) == "string" or file == nil then
+      return false
+   end
 
-    file:close()
+   file:close()
 
-    return true
+   return true
 end
 
 return FM

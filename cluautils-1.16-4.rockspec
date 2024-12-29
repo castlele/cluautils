@@ -1,8 +1,8 @@
 package = "cluautils"
-version = "1.16-3"
+version = "1.16-4"
 source = {
     url = "git://github.com/castlele/cluautils.git",
-    tag = "1.16.3"
+    tag = "1.16.4"
 }
 description = {
    homepage = "*** please enter a project homepage ***",

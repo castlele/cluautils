@@ -1,3 +1,5 @@
+
+
 ---@param value any
 ---@return boolean
 function table:contains(value)
@@ -128,4 +130,14 @@ function table.alloc(size, defaultValue)
    end
 
    return t
+end
+
+---@return string
+function table:toString()
+   local json = require("cluautils.json")
+
+   return json.encode(self, {
+      pretty = true,
+      indent = "    ",
+   })
 end

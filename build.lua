@@ -1,6 +1,7 @@
 ---@diagnostic disable-next-line
 conf = {
-   install = "luarocks make",
+   install = "sudo luarocks make",
+   remove = "sudo luarocks remove cluautils",
    allTest = [[
       ./run_tests.sh "*"
    ]],

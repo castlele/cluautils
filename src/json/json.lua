@@ -1,15 +1,14 @@
 require("cluautils.string_utils")
-JSON = require("JSON")
+local JSON = require("JSON")
 
----@MARK - API
-
-Json = {}
+local Json = {}
 
 ---@enum JsonType
 JsonType = {
     ARRAY = "%b[]",
     DICTIONARY = "%b{}"
 }
+
 
 ---@param str string
 ---@param outer_type JsonType?
@@ -50,5 +49,6 @@ function Json.encode(obj, options)
 
     return encoded_obj
 end
+
 
 return Json
