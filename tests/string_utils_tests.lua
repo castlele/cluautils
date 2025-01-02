@@ -1,175 +1,176 @@
-require("src.tests.base_test_case")
-require("src.string_utils.string_utils")
+local t = require("src.tests")
+local sut = require("src.string_utils.string_utils")
 
-StringTestCase = CTestCase
-
----@MARK - Helpers
-
+---@param t1 table
+---@param t2 table
+---@return boolean
 local function compare(t1, t2)
-    if #t1 ~= #t2 then
-        return false
-    end
+   if #t1 ~= #t2 then
+      return false
+   end
 
-    for index, value in pairs(t1) do
-        if value ~= t2[index] then
-            return false
-        end
-    end
+   for index, value in pairs(t1) do
+      if value ~= t2[index] then
+         return false
+      end
+   end
 
-    return true
+   return true
 end
 
----@MARK - is_empty method tests
+t.describe("String utils tests", function()
+   t.it("test_string_empty_isEmpty", function()
+      local str = ""
 
-function StringTestCase:test_string_empty_is_empty()
-    local str = ""
+      local result = sut.isEmpty(str)
 
-    local result = str:is_empty()
+      return result
+   end)
 
-    return result
-end
+   t.it("test_string_not_empty_isEmpty", function()
+      local str = "hello"
 
-function StringTestCase:test_string_not_empty_is_empty()
-    local str = "hello"
+      local result = sut.isEmpty(str)
 
-    local result = str:is_empty()
+      return result == false
+   end)
 
-    return result == false
-end
+   t.it("test_left_trim", function()
+      local str = "     hello"
 
----@MARK - trim methods tests
+      local result = sut.triml(str)
 
-function StringTestCase:test_left_trim()
-    local str = "     hello"
+      return result == "hello"
+   end)
 
-    local result = str:triml()
+   t.it("test_right_trim", function()
+      local str = "hello      "
 
-    return result == "hello"
-end
+      local result = sut.trimr(str)
 
-function StringTestCase:test_right_trim()
-    local str = "hello      "
+      return result == "hello"
+   end)
 
-    local result = str:trimr()
+   t.it("test_trim", function()
+      local str = "       hello      "
 
-    return result == "hello"
-end
+      local result = sut.trim(str)
 
-function StringTestCase:test_trim()
-    local str = "       hello      "
+      return result == "hello"
+   end)
 
-    local result = str:trim()
+   t.it("test_split_empty_string", function()
+      local string_to_split = ""
+      local separator = "\n"
 
-    return result == "hello"
-end
+      local splitted = sut.split(string_to_split, separator)
 
----@MARK - split method tests
+      return compare(splitted, { string_to_split })
+   end)
 
-function StringTestCase:test_split_empty_string()
-    local string_to_split = ""
-    local separator = "\n"
+   t.it("test_split_with_empty_separator", function()
+      local string_to_split = "Hello"
+      local separator = ""
 
-    local splitted = string_to_split:split(separator)
+      local splitted = sut.split(string_to_split, separator)
 
-    return compare(splitted, {string_to_split})
-end
+      return compare(splitted, { string_to_split })
+   end)
 
-function StringTestCase:test_split_with_empty_separator()
-    local string_to_split = "Hello"
-    local separator = ""
+   t.it("test_split_word_with_character", function()
+      local string_to_split = "Hello"
+      local separator = "e"
 
-    local splitted = string_to_split:split(separator)
+      local splitted = sut.split(string_to_split, separator)
 
-    return compare(splitted, {string_to_split})
-end
+      return compare(splitted, { "H", "llo" })
+   end)
 
-function StringTestCase:test_split_word_with_character()
-    local string_to_split = "Hello"
-    local separator = "e"
+   t.it("test_split_word_with_character_multiple_times", function()
+      local string_to_split = "Hello"
+      local separator = "l"
 
-    local splitted = string_to_split:split(separator)
+      local splitted = sut.split(string_to_split, separator)
 
-    return compare(splitted, {"H", "llo"})
-end
+      return compare(splitted, { "He", "o" })
+   end)
 
-function StringTestCase:test_split_word_with_character_multiple_times()
-    local string_to_split = "Hello"
-    local separator = "l"
+   t.it("test_split_word_with_character_at_the_end_of_the_word", function()
+      local string_to_split = "Hello"
+      local separator = "o"
 
-    local splitted = string_to_split:split(separator)
+      local splitted = sut.split(string_to_split, separator)
 
-    return compare(splitted, {"He", "o"})
-end
+      return compare(splitted, { "Hell" })
+   end)
 
-function StringTestCase:test_split_word_with_character_at_the_end_of_the_word()
-    local string_to_split = "Hello"
-    local separator = "o"
+   t.it("test_split_word_with_character_at_the_start_of_the_word", function()
+      local string_to_split = "Hello"
+      local separator = "H"
 
-    local splitted = string_to_split:split(separator)
+      local splitted = sut.split(string_to_split, separator)
 
-    return compare(splitted, {"Hell"})
-end
+      return compare(splitted, { "ello" })
+   end)
 
-function StringTestCase:test_split_word_with_character_at_the_start_of_the_word()
-    local string_to_split = "Hello"
-    local separator = "H"
+   t.it("test_split_two_words_by_space", function()
+      local string_to_split = "Hello world"
+      local separator = " "
 
-    local splitted = string_to_split:split(separator)
+      local splitted = sut.split(string_to_split, separator)
 
-    return compare(splitted, {"ello"})
-end
+      return compare(splitted, { "Hello", "world" })
+   end)
 
-function StringTestCase:test_split_two_words_by_space()
-    local string_to_split = "Hello world"
-    local separator = " "
+   t.it("test_split_three_words_by_space", function()
+      local string_to_split = "Hello hello hello"
+      local separator = " "
 
-    local splitted = string_to_split:split(separator)
+      local splitted = sut.split(string_to_split, separator)
 
-    return compare(splitted, {"Hello", "world"})
-end
+      return compare(splitted, { "Hello", "hello", "hello" })
+   end)
 
-function StringTestCase:test_split_three_words_by_space()
-    local string_to_split = "Hello hello hello"
-    local separator = " "
+   t.it("test_split_two_words_by_new_line", function()
+      local string_to_split = "Hello\nhello"
+      local separator = "\n"
 
-    local splitted = string_to_split:split(separator)
+      local splitted = sut.split(string_to_split, separator)
 
-    return compare(splitted, {"Hello", "hello", "hello"})
-end
+      return compare(splitted, { "Hello", "hello" })
+   end)
 
-function StringTestCase:test_split_two_words_by_new_line()
-    local string_to_split = "Hello\nhello"
-    local separator = "\n"
-
-    local splitted = string_to_split:split(separator)
-
-    return compare(splitted, {"Hello", "hello"})
-end
-
-function StringTestCase:test_split_two_words_in_multiline_string()
-    local string_to_split = [[
+   t.it("test_split_two_words_in_multiline_string", function()
+      local string_to_split = [[
 Hello
 hello]]
-    local separator = "\n"
+      local separator = "\n"
 
-    local splitted = string_to_split:split(separator)
+      local splitted = sut.split(string_to_split, separator)
 
-    return compare(splitted, {"Hello", "hello"})
-end
+      return compare(splitted, { "Hello", "hello" })
+   end)
 
-function StringTestCase:test_split_json()
-    local string_to_split = [[
+   t.it("test_split_json", function()
+      local string_to_split = [[
 {
     "hello": "world",
     "number": 1
 }
 ]]
-    local separator = "\n"
+      local separator = "\n"
 
-    local splitted = string_to_split:split(separator)
+      local splitted = sut.split(string_to_split, separator)
 
-    return compare(splitted, {"{", '    "hello": "world",', '    "number": 1', "}"})
-end
+      return compare(
+         splitted,
+         { "{", '    "hello": "world",', '    "number": 1', "}" }
+      )
+   end)
 
-
-StringTestCase:run_tests()
+   t.it("is_string_nil_or_empty", function()
+      t.expect(sut.isNilOrEmpty(nil), "Nil string is not nil")
+      t.expect(sut.isNilOrEmpty(""), "Empty string is not empty")
+      t.expect(not sut.isNilOrEmpty("hello"), "None empty string is empty")
+   end)
+end)

@@ -1,4 +1,4 @@
-require("cluautils")
+local strutils = require("cluautils.string_utils")
 
 FM = FM or {}
 
@@ -111,7 +111,6 @@ end
 ---}
 ---
 --- Find terminal command implementation
----
 ---@param param_table find
 ---@return table
 function FM.get_dir_content(param_table)
@@ -133,16 +132,16 @@ function FM.get_dir_content(param_table)
    local name_param = ""
    local max_depth_param = ""
 
-   if not CUtils.is_string_nil_or_empty(file_type) then
+   if not strutils.isNilOrEmpty(file_type) then
       file_param = '-type ' .. file_type
    end
 
-   if not CUtils.is_string_nil_or_empty(name_pattern) then
+   if not strutils.isNilOrEmpty(name_pattern) then
       name_param = '-name "' .. name_pattern .. '"'
    end
 
    if type(max_depth) == "string" then
-      if CUtils.is_string_nil_or_empty(tostring(max_depth)) then
+      if strutils.isNilOrEmpty(tostring(max_depth)) then
          max_depth_param = '-maxdepth ' .. max_depth
       end
    elseif type(max_depth) == "number" and max_depth >= 0 then

@@ -1,50 +1,72 @@
-require("cluautils.table_utils")
-
----@MARK - Constants
+local M = {}
 
 local start_line_pattern = "^(.-)"
 local end_line_pattern = "(.*)$"
 
----@MARK - API
-
+---@param str string
 ---@return boolean
-function string:is_empty()
-    return #self == 0
+function M.isEmpty(str)
+   return #str == 0
 end
 
-function string:trimr()
-    return string.gsub(self, "%s+$", "")
+---@param str string
+---@return string
+function M.trimr(str)
+   local result = string.gsub(str, "%s+$", "")
+
+   return result
 end
 
-function string:triml()
-    return string.gsub(self, "^%s+", "")
+---@param str string
+---@return string
+function M.triml(str)
+   local result = string.gsub(str, "^%s+", "")
+   return result
 end
 
-function string:trim()
-    return self:trimr():triml()
+---@param str string
+---@return string
+function M.trim(str)
+   return M.triml(M.trimr(str))
 end
 
+---@param str string
 ---@param sep string
 ---@return table
-function string:split(sep)
-    if #self == 0 or #sep == 0 then
-        return {self}
-    end
+function M.split(str, sep)
+   if #str == 0 or #sep == 0 then
+      return { str }
+   end
 
-    local matched = self:match(start_line_pattern .. sep)
+   local matched = str:match(start_line_pattern .. sep)
 
-    if matched == nil then
-        return {self}
-    end
+   if matched == nil then
+      return { str }
+   end
 
-    local result = {}
+   local result = {}
 
-    if matched ~= "" then
-        table.insert(result, matched)
-    end
+   if matched ~= "" then
+      table.insert(result, matched)
+   end
 
-    return table.concat_tables(result, self:match(sep .. end_line_pattern):split(sep), function (splitted_string)
-        return not splitted_string:is_empty()
-    end)
+   for _, splittedStr in ipairs(M.split(str:match(sep .. end_line_pattern), sep)) do
+      if not M.isEmpty(splittedStr) then
+         table.insert(result, splittedStr)
+      end
+   end
+
+   return result
 end
 
+---@param str string
+---@return boolean
+function M.isNilOrEmpty(str)
+   if not str then
+      return true
+   end
+
+   return M.isEmpty(str)
+end
+
+return M

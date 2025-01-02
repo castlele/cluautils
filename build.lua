@@ -1,18 +1,24 @@
+---@param cmd string
+---@return string
+local function runTestsCommand(cmd)
+   local runner = "./run_tests.sh \"%s\""
+   return string.format(runner, cmd)
+end
+
 ---@diagnostic disable-next-line
 conf = {
    install = "sudo luarocks make",
    remove = "sudo luarocks remove cluautils",
-   allTest = [[
-      ./run_tests.sh "*"
-   ]],
+   allTest = runTestsCommand("*"),
    threadTest = [[
       bear -- make build
       make test_thread
-      ./run_tests.sh "cthread*"
-   ]],
+   ]] .. runTestsCommand("cthread*"),
    memoryTest = [[
       bear -- make build
-      ./run_tests.sh "cmemory*"
-   ]],
-   oopTest = "./run_tests.sh \"oop*\""
+   ]] .. runTestsCommand("cmemory*"),
+   oopTest = runTestsCommand("oop"),
+   stringTest = runTestsCommand("string_utils*"),
+   jsonTest = runTestsCommand("json*"),
+   fmTest = runTestsCommand("file_manager*"),
 }
