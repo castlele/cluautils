@@ -21,4 +21,7 @@ conf = {
    stringTest = runTestsCommand("string_utils*"),
    jsonTest = runTestsCommand("json*"),
    fmTest = runTestsCommand("file_manager*"),
+   tableTest = runTestsCommand("table_utils*"),
+   hashmapTest = runTestsCommand("*hashmap*"),
+   linkedlistTest = runTestsCommand("linkedlist*"),
 }

@@ -1,4 +1,4 @@
-require("cluautils.table_utils")
+local tableutils = require("src.table_utils.table_utils")
 local t = require("src.tests")
 local LinkedList = require("src.datastructures.linkedlist")
 
@@ -190,7 +190,7 @@ t.describe("Linked list tests", function ()
 
       local result = sut:toTable()
 
-      t.expect(table.is_empty(result))
+      t.expect(tableutils.is_empty(result))
    end)
 
    t.it("Convertion to table from NONE empty linked list results in table representation", function ()
@@ -199,7 +199,7 @@ t.describe("Linked list tests", function ()
 
       local result = sut:toTable()
 
-      t.expect(table.is_equal(result, list))
+      t.expect(tableutils.is_equal(result, list))
    end)
 
    t.it("First returns nil if linked list is empty", function ()
@@ -241,7 +241,7 @@ t.describe("Linked list functional programming tests", function ()
       local filteringFunc = function (item) return item % 2 == 0 end
       local mapFunc = function (item) return tostring(item) end
       local list = { 1, 2, 3, 4, 5, 6 }
-      local expectedList = table.map(table.filter(list, filteringFunc), mapFunc)
+      local expectedList = tableutils.map(tableutils.filter(list, filteringFunc), mapFunc)
       local sut = LinkedList(list)
 
       local result = sut
@@ -249,7 +249,7 @@ t.describe("Linked list functional programming tests", function ()
          :map(mapFunc)
          :toTable()
 
-      t.expect(table.is_equal(expectedList, result))
+      t.expect(tableutils.is_equal(expectedList, result))
    end)
 
    t.it("Filtering empty linked list returns empty table", function ()
@@ -257,7 +257,7 @@ t.describe("Linked list functional programming tests", function ()
 
       local result = sut:filter(function (_) return true end):toTable()
 
-      t.expect(table.is_empty(result))
+      t.expect(tableutils.is_empty(result))
    end)
 
    t.it("Empty filtering should return the same list items in the same order", function ()
@@ -267,18 +267,18 @@ t.describe("Linked list functional programming tests", function ()
 
       local result = sut:filter(filterCallback):toTable()
 
-      t.expect(table.is_equal(list, result))
+      t.expect(tableutils.is_equal(list, result))
    end)
 
    t.it("Linked list can filter its notes returning table of values", function ()
       local filterCallback = function (item) return item % 2 == 0 end
       local list = { 1, 2, 3, 4, 5, 6 }
-      local expectedList = table.filter(list, filterCallback)
+      local expectedList = tableutils.filter(list, filterCallback)
       local sut = LinkedList(list)
 
       local result = sut:filter(filterCallback):toTable()
 
-      t.expect(table.is_equal(expectedList, result))
+      t.expect(tableutils.is_equal(expectedList, result))
    end)
 
    t.it("Map function has no effect on empty list", function ()
@@ -287,7 +287,7 @@ t.describe("Linked list functional programming tests", function ()
 
       local result = sut:map(mapFunc):toTable()
 
-      t.expect(table.is_empty(result))
+      t.expect(tableutils.is_empty(result))
    end)
 
    t.it("Map function that returns the same item has no effect on original linked list order and elements", function ()
@@ -297,18 +297,18 @@ t.describe("Linked list functional programming tests", function ()
 
       local result = sut:map(mapFunc):toTable()
 
-      t.expect(table.is_equal(list, result))
+      t.expect(tableutils.is_equal(list, result))
    end)
 
    t.it("Map function can return new values", function ()
       local mapFunc = function (item) return item * 2 end
       local list = { 1, 2, 3, 4, 5 }
-      local expectedList = table.map(list, mapFunc)
+      local expectedList = tableutils.map(list, mapFunc)
       local sut = LinkedList(list)
 
       local result = sut:map(mapFunc):toTable()
 
-      t.expect(table.is_equal(expectedList, result))
+      t.expect(tableutils.is_equal(expectedList, result))
    end)
 end)
 

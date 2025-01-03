@@ -1,4 +1,3 @@
-require("cluautils.table_utils")
 local LinkedList = require("cluautils.datastructures.linkedlist")
 local Pair = require("cluautils.datastructures.pair")
 
