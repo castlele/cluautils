@@ -36,7 +36,7 @@ jobs:
       - name: test
         run: |
           luarocks make
-          ./run_tests.sh "*"
+          ./run_tests.sh "*.lua"
 
   deploy:
     runs-on: ubuntu-latest

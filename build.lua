@@ -5,11 +5,19 @@ local function runTestsCommand(cmd)
    return string.format(runner, cmd)
 end
 
+---@return string
+local function getCurrentFileName()
+   local filePath = vim.fn.expand("%")
+   local pathComponents = vim.fn.split(filePath, "/")
+   return pathComponents[#pathComponents]
+end
+
 ---@diagnostic disable-next-line
 conf = {
    install = "sudo luarocks make",
    remove = "sudo luarocks remove cluautils",
-   allTest = runTestsCommand("*"),
+   currentTest = runTestsCommand(getCurrentFileName()),
+   allTest = runTestsCommand("*.lua"),
    threadTest = [[
       bear -- make build
       make test_thread

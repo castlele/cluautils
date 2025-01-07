@@ -57,6 +57,7 @@ function M.is_equal(self, other_table)
    return true
 end
 
+---@deprecated Use table.concat() instead
 ---@param self table
 ---@param other_table table
 ---@param element_condition? fun(any):boolean
@@ -82,6 +83,19 @@ function M.concat_tables(self, other_table, element_condition)
    end
 
    return final_result
+end
+
+---@param lhs table
+---@param rhs table
+---@return table
+function M.concat(lhs, rhs)
+   local result = lhs
+
+   for k, v in pairs(rhs) do
+      result[k] = v
+   end
+
+   return result
 end
 
 ---@generic T
