@@ -1,16 +1,16 @@
 package = "cluautils"
-version = "1.18-1"
+version = "1.19-0"
 source = {
-    url = "git://github.com/castlele/cluautils.git",
-    tag = "1.18.1"
+   url = "git://github.com/castlele/cluautils.git",
+   tag = "1.19.0",
 }
 description = {
    homepage = "*** please enter a project homepage ***",
-   license = "MIT"
+   license = "MIT",
 }
 dependencies = {
-    "lua ~> 5.1",
-    "json-lua >= 0.1"
+   "lua ~> 5.1",
+   "json-lua >= 0.1",
 }
 
 local incDir = "./internal"
@@ -29,9 +29,15 @@ build = {
       ["cluautils.table_utils"] = "src/table_utils/table_utils.lua",
       ["cluautils.functions"] = "src/functions/functions.lua",
       ["cluautils.cobject"] = "src/cobject.lua",
+      ["cluautils.os"] = {
+         sources = {
+            "./src/os/os.c",
+         },
+         incdirs = { incDir },
+      },
       ["cluautils.memory"] = {
          sources = {
-            "./src/memory/memory.c"
+            "./src/memory/memory.c",
          },
          incdirs = { incDir },
       },
@@ -39,7 +45,7 @@ build = {
          sources = {
             "src/threads/thread.c",
             "src/threads/internal/cthread.c",
-            "src/threads/internal/queue.c"
+            "src/threads/internal/queue.c",
          },
          libdirs = { "src/threads/bin/" },
          incdirs = {
@@ -51,5 +57,5 @@ build = {
    copy_directories = {
       "tests",
       "examples",
-   }
+   },
 }

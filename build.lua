@@ -12,9 +12,17 @@ local function getCurrentFileName()
    return pathComponents[#pathComponents]
 end
 
+local function install()
+   if require("cluautils.os").getName() == "MacOS" then
+      return "sudo luarocks make"
+   end
+
+   return "luarocks make"
+end
+
 ---@diagnostic disable-next-line
 conf = {
-   install = "sudo luarocks make",
+   install = install(),
    remove = "sudo luarocks remove cluautils",
    currentTest = runTestsCommand(getCurrentFileName()),
    allTest = runTestsCommand("*.lua"),
@@ -32,4 +40,5 @@ conf = {
    tableTest = runTestsCommand("table_utils*"),
    hashmapTest = runTestsCommand("*hashmap*"),
    linkedlistTest = runTestsCommand("linkedlist*"),
+   osTest = runTestsCommand("os*"),
 }
