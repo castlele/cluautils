@@ -167,4 +167,94 @@ function M.toString(self)
    })
 end
 
+---@param start number
+---@param stop number
+---@param step number
+---@return table<number>
+function M.makeRange(start, stop, step)
+   local t = {}
+
+   for i = start, stop, step do
+      table.insert(t, i)
+   end
+
+   return t
+end
+
+---@param t table<T>
+---@param compare (fun(T, T): boolean)?
+function M.mergeSort(t, compare)
+   local c = compare or function(a, b)
+      return a < b
+   end
+
+   ---@param l integer
+   ---@param r integer
+   ---@return table<T>
+   local function sub(l, r)
+      local res = {}
+
+      for i = l, r do
+         table.insert(res, t[i])
+      end
+
+      return res
+   end
+
+   ---@param l integer
+   ---@param m integer
+   ---@param r integer
+   local function merge(l, m, r)
+      local L = sub(l, m)
+      local R = sub(m + 1, r)
+
+      local n1 = m - l + 1
+      local n2 = r - m
+
+      local i = 1
+      local j = 1
+      local k = 1
+
+      while i <= n1 and j <= n2 do
+         if c(L[i], R[j]) then
+            t[k] = L[i]
+            i = i + 1
+         else
+            t[k] = R[j]
+            j = j + 1
+         end
+
+         k = k + 1
+      end
+
+      while i <= n1 do
+         t[k] = L[i]
+         i = i + 1
+         k = k + 1
+      end
+
+      while j <= n2 do
+         t[k] = R[j]
+         j = j + 1
+         k = k + 1
+      end
+   end
+
+   ---@param l integer
+   ---@param r integer
+   local function sort(l, r)
+      if l >= r then
+         return
+      end
+
+      local m = math.floor(l + (r - l) / 2)
+
+      sort(l, m)
+      sort(m + 1, r)
+      merge(l, m, r)
+   end
+
+   sort(1, #t)
+end
+
 return M

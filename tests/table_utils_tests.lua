@@ -307,4 +307,59 @@ t.describe("Table utils tests", function()
       t.expect(result.greeting == rhs.greeting)
       t.expect(result.name == rhs.name)
    end)
+
+   t.it("Merge sort do nothing on empty table", function()
+      local list = {}
+
+      tableutils.mergeSort(list)
+
+      t.expect(tableutils.is_empty(list))
+   end)
+
+   t.it("Merge sort do nothing with single element", function()
+      local list = { 1 }
+
+      tableutils.mergeSort(list)
+
+      t.expect(
+         #list == 1,
+         string.format("Invalid table len: expected 1, got %d", #list)
+      )
+   end)
+
+   t.it("Merge sort do nothing with sorted elements", function ()
+      local expected = { 1, 2, 3 }
+      local list = { 1, 2, 3 }
+
+      tableutils.mergeSort(list)
+
+      t.expectTableEqual(expected, list)
+   end)
+
+   t.it("Merge sort sorts two unordered elements", function ()
+      local expected = { 1, 2 }
+      local list = { 2, 1 }
+
+      tableutils.mergeSort(list)
+
+      t.expectTableEqual(expected, list)
+   end)
+
+   t.it("Merge sort sorts any number of unordered elements", function ()
+      local list = tableutils.makeRange(1000, -1000, -1)
+      local expected = list
+      table.sort(expected)
+
+      tableutils.mergeSort(list)
+
+      t.expectTableEqual(expected, list)
+   end)
+
+   t.it("Range from positive to negative numbers", function ()
+      local expected = { 3, 2, 1, 0, -1, -2, -3}
+
+      local result = tableutils.makeRange(3, -3, -1)
+
+      t.expectTableEqual(expected, result)
+   end)
 end)
