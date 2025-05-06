@@ -182,6 +182,38 @@ function M.makeRange(start, stop, step)
 end
 
 ---@param t table<T>
+---@param element T
+---@return integer?
+function M.binarySearch(t, element)
+   if #t == 0 then
+      return nil
+   end
+
+   local lhs = 1
+   local rhs = #t
+
+   if element <= t[lhs] or element >= t[rhs] then
+      return nil
+   end
+
+   while lhs <= rhs do
+      local mid = math.floor(lhs + (rhs - lhs) / 2)
+
+      if element == t[mid] then
+         return mid
+      end
+
+      if element >= t[mid] then
+         lhs = mid + 1
+      else
+         rhs = mid - 1
+      end
+   end
+
+   return nil
+end
+
+---@param t table<T>
 ---@param compare (fun(T, T): boolean)?
 function M.mergeSort(t, compare)
    local c = compare or function(a, b)

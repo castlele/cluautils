@@ -362,4 +362,27 @@ t.describe("Table utils tests", function()
 
       t.expectTableEqual(expected, result)
    end)
+
+   t.it("Binary search returns nothing on empty table", function ()
+      local result = tableutils.binarySearch({}, 1)
+
+      t.expect(result == nil)
+   end)
+
+   t.it("Binary search returns nothing on non-existing element", function ()
+      local result = tableutils.binarySearch({ 1, 2, 3 }, 4)
+
+      t.expect(result == nil)
+   end)
+
+   t.it("Binary search returns index of existing element", function ()
+      local result = tableutils.binarySearch({ 1, 2, 3, 4, 5 }, 3)
+
+      t.expect(result == 3)
+   end)
+
+   t.it("Binary search returns index of existing element in even list", function ()
+      local result = tableutils.binarySearch({ 1, 2, 4, 5 }, 4)
+      t.expect(result == 3)
+   end)
 end)
